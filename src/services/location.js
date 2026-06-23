@@ -1,7 +1,18 @@
 import { DEFAULT_POSITION } from '../config/constants.js';
 
+const LAST_LOCATION_KEY = 'gasolina:last-location';
+
+function isLocalhost() {
+  return ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
+}
+
 function isSecureEnough() {
-  return window.isSecureContext || ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
+  return window.isSecureContext || isLocalhost();
+}
+
+function emitLocation(location) {
+  window.dispatchEvent(new CustomEvent('gasolina:location', { detail: location }));
+  return location;
 }
 
 function positionOnce(options) {
@@ -16,23 +27,56 @@ function positionOnce(options) {
     }
 
     navigator.geolocation.getCurrentPosition(
-      (position) => resolve({
-        latitud: position.coords.latitude,
-        longitud: position.coords.longitude,
-        accuracy: Math.round(position.coords.accuracy || 0),
-        label: 'tu ubicación actual',
-        source: 'device'
-      }),
+      (position) => resolve(normalizeDevicePosition(position)),
       (error) => reject(new Error(geoErrorMessage(error))),
       options
     );
   });
 }
 
+function watchPositionOnce(timeout = 12000) {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation || !isSecureEnough()) {
+      reject(new Error('Geolocalización no disponible'));
+      return;
+    }
+
+    let watchId = null;
+    const timer = window.setTimeout(() => {
+      if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+      reject(new Error('El navegador tardó demasiado en dar la ubicación'));
+    }, timeout);
+
+    watchId = navigator.geolocation.watchPosition(
+      (position) => {
+        window.clearTimeout(timer);
+        navigator.geolocation.clearWatch(watchId);
+        resolve(normalizeDevicePosition(position));
+      },
+      (error) => {
+        window.clearTimeout(timer);
+        if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+        reject(new Error(geoErrorMessage(error)));
+      },
+      { enableHighAccuracy: false, timeout, maximumAge: 10 * 60 * 1000 }
+    );
+  });
+}
+
+function normalizeDevicePosition(position) {
+  return {
+    latitud: position.coords.latitude,
+    longitud: position.coords.longitude,
+    accuracy: Math.round(position.coords.accuracy || 0),
+    label: 'tu ubicación actual',
+    source: 'device'
+  };
+}
+
 async function devicePosition() {
   const tries = [
-    { enableHighAccuracy: true, timeout: 15000, maximumAge: 2 * 60 * 1000 },
-    { enableHighAccuracy: false, timeout: 10000, maximumAge: 15 * 60 * 1000 }
+    { enableHighAccuracy: false, timeout: 7000, maximumAge: 10 * 60 * 1000 },
+    { enableHighAccuracy: true, timeout: 12000, maximumAge: 2 * 60 * 1000 }
   ];
 
   let lastError = null;
@@ -45,21 +89,30 @@ async function devicePosition() {
       lastError = error;
     }
   }
+
+  try {
+    const location = await watchPositionOnce();
+    saveLastLocation(location);
+    return location;
+  } catch (error) {
+    lastError = error;
+  }
+
   throw lastError || new Error('No se pudo obtener la ubicación del dispositivo');
 }
 
 function saveLastLocation(location) {
   try {
-    window.localStorage.setItem('gasolina:last-location', JSON.stringify({ ...location, savedAt: Date.now() }));
+    window.localStorage.setItem(LAST_LOCATION_KEY, JSON.stringify({ ...location, savedAt: Date.now() }));
   } catch {}
 }
 
-function lastDeviceLocation() {
+function lastDeviceLocation(maxAge = 24 * 60 * 60 * 1000) {
   try {
-    const raw = window.localStorage.getItem('gasolina:last-location');
+    const raw = window.localStorage.getItem(LAST_LOCATION_KEY);
     const saved = raw ? JSON.parse(raw) : null;
     if (!saved?.latitud || !saved?.longitud) return null;
-    if (Date.now() - Number(saved.savedAt || 0) > 60 * 60 * 1000) return null;
+    if (Date.now() - Number(saved.savedAt || 0) > maxAge) return null;
     return { ...saved, label: 'tu última ubicación', source: 'device-cache' };
   } catch {
     return null;
@@ -76,19 +129,25 @@ function geoErrorMessage(error) {
 
 async function ipPosition() {
   const endpoints = [
-    'https://ipapi.co/json/',
-    'https://ipwho.is/',
-    'http://ip-api.com/json/?fields=status,message,lat,lon,city,regionName,country,query'
+    { url: 'https://ipwho.is/', provider: 'ipwhois' },
+    { url: 'https://ipapi.co/json/', provider: 'ipapi' }
   ];
+
+  if (window.location.protocol === 'http:' || isLocalhost()) {
+    endpoints.push({
+      url: 'http://ip-api.com/json/?fields=status,message,lat,lon,city,regionName,country,query',
+      provider: 'ipapi-http'
+    });
+  }
 
   let lastError = null;
   for (const endpoint of endpoints) {
     try {
-      const response = await fetch(endpoint, { cache: 'no-store' });
+      const response = await fetch(endpoint.url, { cache: 'no-store', mode: 'cors' });
       const data = await response.json();
       if (!response.ok) throw new Error('No se pudo consultar la ubicación por IP');
 
-      if (endpoint.includes('ipapi.co')) {
+      if (endpoint.provider === 'ipapi') {
         if (!data.latitude || !data.longitude) throw new Error(data.reason || 'ipapi no respondió con ubicación');
         return {
           latitud: data.latitude,
@@ -99,7 +158,7 @@ async function ipPosition() {
         };
       }
 
-      if (endpoint.includes('ipwho.is')) {
+      if (endpoint.provider === 'ipwhois') {
         if (data.success === false || !data.latitude || !data.longitude) throw new Error(data.message || 'ipwho.is no respondió con ubicación');
         return {
           latitud: data.latitude,
@@ -128,16 +187,16 @@ async function ipPosition() {
 export async function getBestLocation({ preferFresh = true } = {}) {
   const cached = lastDeviceLocation();
 
-  if (!preferFresh && cached) return cached;
+  if (!preferFresh && cached) return emitLocation(cached);
 
   try {
-    return await devicePosition();
+    return emitLocation(await devicePosition());
   } catch (deviceError) {
-    if (cached) return cached;
+    if (cached) return emitLocation(cached);
     try {
-      return await ipPosition();
+      return emitLocation(await ipPosition());
     } catch {
-      return { ...DEFAULT_POSITION, error: deviceError.message };
+      return emitLocation({ ...DEFAULT_POSITION, error: deviceError.message });
     }
   }
 }

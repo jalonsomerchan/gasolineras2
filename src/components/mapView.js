@@ -16,7 +16,11 @@ export function MapView(stations = [], options = {}) {
   }, 'Cargando mapa...');
 
   window.requestAnimationFrame(() => initMap(id, stations, options));
-  return h('div', { class: `map-card ${options.small ? 'is-compact-map' : ''}` }, node);
+  const children = [node];
+  if (options.small) {
+    children.push(h('a', { class: 'map-open-button', href: '#/mapa', onClick: (event) => { event.preventDefault(); document.getElementById('nearby-map')?.scrollIntoView({ behavior: 'smooth' }); } }, h('span', { 'aria-hidden': 'true' }, '◇'), 'Ver mapa'));
+  }
+  return h('div', { class: `map-card ${options.small ? 'is-compact-map' : ''}` }, children);
 }
 
 async function initMap(id, stations, options) {

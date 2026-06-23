@@ -1,3 +1,4 @@
+import { NEARBY_RADIUS_KM } from '../config/constants.js';
 import { FuelStore } from '../state/fuelStore.js';
 import { h } from '../utils/dom.js';
 import { numberValue, shortPrice } from '../utils/format.js';
@@ -25,7 +26,7 @@ export function PriceRadar(stations = [], locationLabel = '') {
   return h('section', { id: 'price-radar', class: 'radar-card' },
     h('div', { class: 'radar-header' },
       h('p', {}, 'Radar de precios'),
-      h('span', {}, locationLabel ? `Dentro de 35 km · ${locationLabel}` : 'Dentro de 35 km')
+      h('span', {}, locationLabel ? `Dentro de ${NEARBY_RADIUS_KM} km · ${locationLabel}` : `Dentro de ${NEARBY_RADIUS_KM} km`)
     ),
     h('div', { class: 'radar-grid' },
       metric('Más barata', min, 'good'),

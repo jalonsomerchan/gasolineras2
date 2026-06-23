@@ -7,4 +7,4 @@ export const DEFAULT_POSITION = {
   source: 'default'
 };
 export const NEARBY_LIMIT = 40;
-export const NEARBY_RADIUS_KM = 35;
+export const NEARBY_RADIUS_KM = 25;

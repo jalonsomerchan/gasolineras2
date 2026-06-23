@@ -7,7 +7,7 @@ export function numberValue(value) {
 export function price(value) {
   const parsed = numberValue(value);
   if (parsed === null || parsed <= 0) return '—';
-  return `${parsed.toLocaleString('es-ES', { minimumFractionDigits: 3, maximumFractionDigits: 3 })} €/l`;
+  return `${parsed.toLocaleString('es-ES', { minimumFractionDigits: 3, maximumFractionDigits: 3 })} €/L`;
 }
 
 export function shortPrice(value) {
