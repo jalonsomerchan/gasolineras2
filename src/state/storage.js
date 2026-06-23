@@ -14,3 +14,8 @@ export function writeStorage(key, value) {
     // localStorage may be unavailable in private mode.
   }
 }
+
+export const Storage = {
+  get: readStorage,
+  set: writeStorage
+};

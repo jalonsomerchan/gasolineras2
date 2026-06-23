@@ -1,9 +1,8 @@
-const CACHE_NAME = 'gasolineras2-v3';
+const CACHE_NAME = 'gasolineras2-v4';
 const APP_SHELL = [
   './',
   './index.html',
   './manifest.webmanifest',
-  './config.js',
   './assets/icon.svg',
   './assets/icon-192.png',
   './assets/icon-512.png',
@@ -62,6 +61,11 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET') return;
 
   const url = new URL(request.url);
+  if (url.pathname.endsWith('/config.js')) {
+    event.respondWith(fetch(request, { cache: 'no-store' }).catch(() => caches.match(request)));
+    return;
+  }
+
   if (url.hostname.includes('alon.one')) {
     event.respondWith(fetch(request).catch(() => caches.match(request)));
     return;

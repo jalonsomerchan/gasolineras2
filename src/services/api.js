@@ -14,11 +14,6 @@ function apiKey() {
   return config.apiKey || config.API_KEY || '';
 }
 
-function authHeaders() {
-  const key = apiKey();
-  return key ? { Authorization: `Bearer ${key}`, 'X-API-Key': key } : {};
-}
-
 async function request(endpoint, params = {}) {
   const path = String(endpoint).replace(/^\/+/, '');
   const url = new URL(`${apiBase()}/${path}`);
@@ -26,7 +21,10 @@ async function request(endpoint, params = {}) {
     if (value !== undefined && value !== null && value !== '') url.searchParams.set(key, value);
   });
 
-  const response = await fetch(url, { headers: authHeaders() });
+  const key = apiKey();
+  if (key) url.searchParams.set('api_key', key);
+
+  const response = await fetch(url);
   const data = await response.json().catch(() => null);
   if (!response.ok || data?.error) {
     throw new Error(data?.msg || `Error ${response.status} consultando la API`);
