@@ -108,4 +108,3 @@ export function RadarPage() {
   return page;
 }
 
-export const HomePage = RadarPage;

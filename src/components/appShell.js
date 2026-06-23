@@ -22,7 +22,7 @@ export function AppShell(content) {
     h('a', { class: 'skip-link', href: '#main' }, 'Saltar al contenido'),
     h('header', { class: 'app-header' },
       h('div', { class: 'header-inner' },
-        h('a', { class: 'brand', href: '#/radar' }, APP_NAME),
+        h('a', { class: 'brand', href: '#/' }, APP_NAME),
         h('div', { class: 'header-actions' },
           LocationPill(),
           ThemeToggle()

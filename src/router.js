@@ -1,4 +1,5 @@
-import { RadarPage, HomePage } from './pages/radarPage.js';
+import { HomePage } from './pages/homePage.js';
+import { RadarPage } from './pages/radarPage.js';
 import { FavoritesPage } from './pages/favoritesPage.js';
 import { SearchPage } from './pages/searchPage.js';
 import { MapPage } from './pages/mapPage.js';
