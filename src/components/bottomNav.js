@@ -5,7 +5,8 @@ const items = [
   { href: '#/radar', path: '/radar', icon: '◎', label: 'Radar' },
   { href: '#/buscar', path: '/buscar', icon: '⌕', label: 'Buscar' },
   { href: '#/favoritos', path: '/favoritos', icon: '♡', label: 'Favoritos' },
-  { href: '#/mapa', path: '/mapa', icon: '◇', label: 'Mapa' }
+  { href: '#/mapa', path: '/mapa', icon: '◇', label: 'Mapa' },
+  { href: '#/ajustes', path: '/ajustes', icon: '⚙', label: 'Ajustes' }
 ];
 
 function currentPath() {

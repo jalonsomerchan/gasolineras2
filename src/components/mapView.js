@@ -1,13 +1,16 @@
 import { ensureLeaflet } from '../services/leafletLoader.js';
 import { devicePosition, getBestLocation } from '../services/location.js';
 import { h, loading } from '../utils/dom.js';
-import { numberValue, price, shortPrice, stationName } from '../utils/format.js';
+import { numberValue, price, stationName } from '../utils/format.js';
 import { stationCoords } from '../utils/geo.js';
 import { FuelStore } from '../state/fuelStore.js';
+import { DiscountStore } from '../state/discountStore.js';
+import { displayFuelPrice, mapMarkerLabel, visibleStations } from '../utils/stationSettings.js';
 
 let mapId = 0;
 
 export function MapView(stations = [], options = {}) {
+  const visible = visibleStations(stations);
   const id = `map-${++mapId}`;
   const node = h('div', {
     class: `map-view ${options.small ? 'small' : ''} ${options.tall ? 'tall' : ''} is-loading`,
@@ -26,10 +29,10 @@ export function MapView(stations = [], options = {}) {
     h('button', { class: 'map-action', type: 'button', dataset: { action: 'cheapest' }, title: 'Ir a la más barata', 'aria-label': 'Ir a la más barata' }, '€'),
     h('button', { class: 'map-action', type: 'button', dataset: { action: 'me' }, title: 'Ir a mi ubicación', 'aria-label': 'Ir a mi ubicación' }, '⌖'),
     h('button', { class: 'map-action', type: 'button', dataset: { action: 'fit' }, title: 'Centrar resultados', 'aria-label': 'Centrar resultados' }, '□'),
-    h('a', { class: 'map-action', dataset: { action: 'google' }, href: googleMapsUrl(stations, options.center), target: '_blank', rel: 'noopener', title: 'Abrir en Google Maps', 'aria-label': 'Abrir en Google Maps' }, 'G')
+    h('a', { class: 'map-action', dataset: { action: 'google' }, href: googleMapsUrl(visible, options.center), target: '_blank', rel: 'noopener', title: 'Abrir en Google Maps', 'aria-label': 'Abrir en Google Maps' }, 'G')
   );
 
-  window.requestAnimationFrame(() => initMap(id, stations, options, controls, searchHere));
+  window.requestAnimationFrame(() => initMap(id, visible, options, controls, searchHere));
   const children = [node, controls];
   if (options.searchHere) children.push(searchHere);
   return h('div', { class: `map-card ${options.small ? 'is-compact-map' : ''} ${options.tall ? 'is-tall-map' : ''}` }, children);
@@ -177,10 +180,12 @@ function addStationMarkers(L, map, bounds, stations, markers = []) {
     .filter(([, coords]) => coords)
     .forEach(([station, coords]) => {
       bounds.push(coords);
-      const currentPrice = station.precio ?? station[fuel.priceField];
-      const marker = L.marker(coords, { icon: priceIcon(L, currentPrice, String(station.ideess) === String(cheapest?.ideess)) })
+      const basePrice = station.precio ?? station[fuel.priceField];
+      const priceInfo = DiscountStore.priceInfo(station.ideess, basePrice);
+      const currentPrice = priceInfo.effective;
+      const marker = L.marker(coords, { icon: priceIcon(L, currentPrice, String(station.ideess) === String(cheapest?.ideess), priceInfo.hasDiscount) })
         .addTo(map)
-        .bindPopup(popupHtml(station, currentPrice));
+        .bindPopup(popupHtml(station, priceInfo));
       marker.on('click', () => marker.openPopup());
       markers.push({ station, marker });
     });
@@ -188,7 +193,8 @@ function addStationMarkers(L, map, bounds, stations, markers = []) {
 
 function stationPrice(station) {
   const fuel = FuelStore.current();
-  return numberValue(station?.precio ?? station?.[fuel.priceField]);
+  const basePrice = station?.precio ?? station?.[fuel.priceField];
+  return numberValue(DiscountStore.effectivePrice(station?.ideess, basePrice));
 }
 
 function cheapestStation(stations = []) {
@@ -197,9 +203,9 @@ function cheapestStation(stations = []) {
     .sort((a, b) => stationPrice(a) - stationPrice(b))[0] || null;
 }
 
-function priceIcon(L, currentPrice, isCheapest) {
-  const label = shortPrice(currentPrice);
-  const tone = isCheapest ? 'is-cheap' : '';
+function priceIcon(L, currentPrice, isCheapest, hasDiscount = false) {
+  const label = mapMarkerLabel(currentPrice);
+  const tone = `${isCheapest ? 'is-cheap' : ''} ${hasDiscount ? 'has-discount' : ''}`.trim();
   return L.divIcon({
     className: 'leaflet-price-marker-wrap',
     html: `<span class="price-marker ${tone}">${escapeHtml(label)}</span>`,
@@ -239,11 +245,23 @@ function googleMapsUrl(stations = [], center = null) {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${coords[0]},${coords[1]}`)}`;
 }
 
-function popupHtml(station, currentPrice) {
+function popupHtml(station, priceInfo) {
+  const display = displayFuelPrice(priceInfo?.effective);
+  const originalDisplay = priceInfo?.hasDiscount ? displayFuelPrice(priceInfo.original) : null;
+  const discount = priceInfo?.hasDiscount
+    ? `<em>Descuento -${escapeHtml(DiscountStore.formatCents(priceInfo.discountCents))} c/L aplicado</em>`
+    : '';
+  const original = priceInfo?.hasDiscount
+    ? `<small>Antes: ${escapeHtml(originalDisplay.main || price(priceInfo.original))}</small>`
+    : '';
+  const secondary = display.secondary ? `<small>${escapeHtml(display.secondary)}</small>` : '';
   return `
     <div class="map-popup">
       <strong>${escapeHtml(stationName(station))}</strong>
-      <span>${escapeHtml(price(currentPrice))}</span>
+      <span>${escapeHtml(display.main)}</span>
+      ${secondary}
+      ${original}
+      ${discount}
       <small>${escapeHtml([station.direccion, station.municipio].filter(Boolean).join(' · '))}</small>
       <a href="#/gasolinera/${encodeURIComponent(station.ideess)}">Ver ficha</a>
     </div>

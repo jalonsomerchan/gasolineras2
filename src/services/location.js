@@ -118,6 +118,30 @@ export function devicePosition({ timeout = 12000 } = {}) {
   });
 }
 
+export async function geolocationPermissionState() {
+  if (!('geolocation' in navigator)) return 'unsupported';
+  if (!navigator.permissions?.query) return 'unknown';
+  try {
+    const result = await navigator.permissions.query({ name: 'geolocation' });
+    return result.state || 'unknown';
+  } catch {
+    return 'unknown';
+  }
+}
+
+export async function shouldAskForLocation() {
+  const state = await geolocationPermissionState();
+  return state !== 'granted';
+}
+
+export async function deviceOrBestLocation({ timeout = 14000 } = {}) {
+  try {
+    return emitLocation(await devicePosition({ timeout }));
+  } catch {
+    return getBestLocation({ preferFresh: true });
+  }
+}
+
 export async function getBestLocation({ preferFresh = false } = {}) {
   const cached = !preferFresh ? lastLocation() : null;
   if (cached) return emitLocation(cached);

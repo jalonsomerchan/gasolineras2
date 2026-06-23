@@ -1,6 +1,7 @@
 import { NEARBY_LIMIT, NEARBY_RADIUS_KM } from '../config/constants.js';
 import { Api } from '../services/api.js';
-import { getBestLocation } from '../services/location.js';
+import { deviceOrBestLocation, shouldAskForLocation } from '../services/location.js';
+import { DiscountStore } from '../state/discountStore.js';
 import { FuelStore } from '../state/fuelStore.js';
 import { h, loading, errorBox, clear } from '../utils/dom.js';
 import { numberValue } from '../utils/format.js';
@@ -9,6 +10,7 @@ import { PriceRadar } from '../components/priceRadar.js';
 import { SortToggle } from '../components/sortToggle.js';
 import { StationList } from '../components/stationList.js';
 import { TrendCard } from '../components/trendCard.js';
+import { LocationGate } from '../components/locationGate.js';
 
 function dateNDaysAgo(days) {
   const date = new Date();
@@ -38,7 +40,7 @@ export function RadarPage() {
   function sortedStations() {
     const fuel = FuelStore.current();
     return [...stations].sort((a, b) => {
-      if (sortBy === 'price') return (numberValue(a[fuel.priceField]) ?? 999) - (numberValue(b[fuel.priceField]) ?? 999);
+      if (sortBy === 'price') return (numberValue(DiscountStore.effectivePrice(a.ideess, a[fuel.priceField] ?? a.precio)) ?? 999) - (numberValue(DiscountStore.effectivePrice(b.ideess, b[fuel.priceField] ?? b.precio)) ?? 999);
       return (numberValue(a.distancia_km) ?? 999) - (numberValue(b.distancia_km) ?? 999);
     });
   }
@@ -55,12 +57,27 @@ export function RadarPage() {
     locationText.textContent = locationLabel(currentLocation);
   }
 
+  function renderLocationGate() {
+    locationText.textContent = 'Permiso de ubicación pendiente';
+    clear(radarContainer).append(LocationGate({
+      onSearch: () => load(true),
+      text: 'Permite la ubicación para crear un radar de precios real cerca de ti.'
+    }));
+    clear(mapContainer);
+    clear(listContainer);
+    clear(sortContainer);
+  }
+
   async function load(forceFresh = false) {
     clear(radarContainer).append(loading('Calculando radar...'));
     clear(mapContainer).append(loading('Cargando mapa...'));
     clear(listContainer).append(loading('Obteniendo ubicación...'));
+    if (!forceFresh && await shouldAskForLocation()) {
+      renderLocationGate();
+      return;
+    }
     try {
-      currentLocation = await getBestLocation({ preferFresh: forceFresh });
+      currentLocation = await deviceOrBestLocation();
       locationText.textContent = locationLabel(currentLocation);
       clear(listContainer).append(loading(`Buscando cerca de ${currentLocation.label || 'ti'}...`));
       stations = await Api.nearby({

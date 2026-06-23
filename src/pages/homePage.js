@@ -1,7 +1,8 @@
 import { NEARBY_LIMIT, NEARBY_RADIUS_KM } from '../config/constants.js';
 import { Api } from '../services/api.js';
-import { getBestLocation } from '../services/location.js';
+import { deviceOrBestLocation, shouldAskForLocation } from '../services/location.js';
 import { FavoritesStore } from '../state/favoritesStore.js';
+import { DiscountStore } from '../state/discountStore.js';
 import { FuelStore } from '../state/fuelStore.js';
 import { h, loading, errorBox, clear } from '../utils/dom.js';
 import { numberValue, shortPrice } from '../utils/format.js';
@@ -12,10 +13,11 @@ import { SearchBox } from '../components/searchBox.js';
 import { SortToggle } from '../components/sortToggle.js';
 import { StationList } from '../components/stationList.js';
 import { TrendCard } from '../components/trendCard.js';
+import { LocationGate } from '../components/locationGate.js';
 
 function bestPrice(stations) {
   const fuel = FuelStore.current();
-  const prices = stations.map((station) => numberValue(station[fuel.priceField] ?? station.precio)).filter((value) => value && value > 0);
+  const prices = stations.map((station) => numberValue(DiscountStore.effectivePrice(station.ideess, station[fuel.priceField] ?? station.precio))).filter((value) => value && value > 0);
   return prices.length ? Math.min(...prices) : null;
 }
 
@@ -49,7 +51,7 @@ export function HomePage() {
   function sortedStations() {
     const fuel = FuelStore.current();
     return [...nearbyStations].sort((a, b) => {
-      if (sortBy === 'price') return (numberValue(a[fuel.priceField]) ?? 999) - (numberValue(b[fuel.priceField]) ?? 999);
+      if (sortBy === 'price') return (numberValue(DiscountStore.effectivePrice(a.ideess, a[fuel.priceField] ?? a.precio)) ?? 999) - (numberValue(DiscountStore.effectivePrice(b.ideess, b[fuel.priceField] ?? b.precio)) ?? 999);
       return (numberValue(a.distancia_km) ?? 999) - (numberValue(b.distancia_km) ?? 999);
     });
   }
@@ -106,7 +108,7 @@ export function HomePage() {
     }
     try {
       const fuel = FuelStore.current();
-      const stations = (await Api.stationsDetail(ids)).sort((a, b) => (numberValue(a[fuel.priceField]) ?? 999) - (numberValue(b[fuel.priceField]) ?? 999));
+      const stations = (await Api.stationsDetail(ids)).sort((a, b) => (numberValue(DiscountStore.effectivePrice(a.ideess, a[fuel.priceField] ?? a.precio)) ?? 999) - (numberValue(DiscountStore.effectivePrice(b.ideess, b[fuel.priceField] ?? b.precio)) ?? 999));
       favoriteContainer.append(StationList(stations.slice(0, 6), { onFavoriteChange: loadFavorites, ranked: true, sortByPrice: true, emptyMessage: 'No tienes favoritos guardados.' }));
     } catch (error) {
       favoriteContainer.append(errorBox(error.message));
@@ -123,17 +125,33 @@ export function HomePage() {
     }
   }
 
+  function renderLocationGate() {
+    clear(radarContainer);
+    clear(nearbyContainer);
+    clear(mapContainer);
+    clear(sortContainer);
+    locationText.textContent = 'Permiso de ubicación pendiente';
+    radarContainer.append(LocationGate({
+      onSearch: () => loadNearby(true),
+      text: 'Pulsa el botón para permitir la ubicación y ver el radar de precios cerca de ti.'
+    }));
+  }
+
   async function loadNearby(forceFresh = false) {
     clear(nearbyContainer);
     clear(mapContainer);
     clear(radarContainer);
+    if (!forceFresh && await shouldAskForLocation()) {
+      renderLocationGate();
+      return;
+    }
     radarContainer.append(loading('Obteniendo precios cercanos...'));
     nearbyContainer.append(loading('Obteniendo ubicación...'));
     try {
-      currentLocation = await getBestLocation({ preferFresh: forceFresh });
+      currentLocation = await deviceOrBestLocation();
       locationText.textContent = locationLabel();
       clear(nearbyContainer);
-      nearbyContainer.append(loading(`Buscando cerca de ${currentLocation.label}...`));
+      nearbyContainer.append(loading(`Buscando cerca de ${currentLocation.label || 'ti'}...`));
       nearbyStations = await Api.nearby({
         latitud: currentLocation.latitud,
         longitud: currentLocation.longitud,

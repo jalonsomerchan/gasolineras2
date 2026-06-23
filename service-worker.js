@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gasolineras2-v13';
+const CACHE_NAME = 'gasolineras2-v15';
 const APP_SHELL = [
   './',
   './index.html',
@@ -20,15 +20,19 @@ const APP_SHELL = [
   './src/state/storage.js',
   './src/state/fuelStore.js',
   './src/state/favoritesStore.js',
+  './src/state/discountStore.js',
+  './src/state/settingsStore.js',
   './src/state/themeStore.js',
   './src/utils/dom.js',
   './src/utils/format.js',
   './src/utils/geo.js',
+  './src/utils/stationSettings.js',
   './src/components/appShell.js',
   './src/components/themeToggle.js',
   './src/components/bottomNav.js',
   './src/components/priceRadar.js',
   './src/components/locationBadge.js',
+  './src/components/locationGate.js',
   './src/components/breadcrumbs.js',
   './src/components/emptyState.js',
   './src/components/fuelToggle.js',
@@ -45,6 +49,7 @@ const APP_SHELL = [
   './src/pages/favoritesPage.js',
   './src/pages/searchPage.js',
   './src/pages/mapPage.js',
+  './src/pages/settingsPage.js',
   './src/pages/municipalityPage.js',
   './src/pages/notFoundPage.js',
   './src/pages/provincePage.js',

@@ -1,7 +1,8 @@
 import { Api } from '../services/api.js';
 import { FuelStore } from '../state/fuelStore.js';
 import { h, loading, errorBox, clear } from '../utils/dom.js';
-import { integer, price, routePart } from '../utils/format.js';
+import { integer, routePart } from '../utils/format.js';
+import { displayFuelPrice } from '../utils/stationSettings.js';
 import { Breadcrumbs } from '../components/breadcrumbs.js';
 import { MapView } from '../components/mapView.js';
 import { StationList } from '../components/stationList.js';
@@ -52,8 +53,8 @@ export function MunicipalityPage(params) {
         h('div', { class: 'card card-pad' },
           StatsGrid([
             { label: 'Gasolineras', value: integer(stats?.total_gasolineras) },
-            { label: `Media ${fuel.shortLabel}`, value: price(stats?.[fuel.priceField]) },
-            { label: `Mínimo ${fuel.shortLabel}`, value: price(stats?.[fuel.minField]) }
+            { label: `Media ${fuel.shortLabel}`, value: displayFuelPrice(stats?.[fuel.priceField]).main },
+            { label: `Mínimo ${fuel.shortLabel}`, value: displayFuelPrice(stats?.[fuel.minField]).main }
           ])
         )
       ),

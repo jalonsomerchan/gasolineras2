@@ -1936,3 +1936,301 @@ button.filter-chip { cursor: pointer; }
   .fuel-price-current { font-size: 1.25rem; }
   .fuel-price-range { justify-content: flex-start; }
 }
+
+/* v14 discounts */
+.station-card.has-discount .price-value,
+.fuel-price-row.has-discount .fuel-price-current strong {
+  color: var(--brand-dark);
+}
+.price-original,
+.station-original-price,
+.fuel-price-original {
+  display: block;
+  color: var(--muted);
+  font-size: .7rem;
+  font-weight: 850;
+  line-height: 1;
+  text-decoration: line-through;
+  opacity: .82;
+}
+.price-discount {
+  max-width: 156px;
+  color: var(--brand-dark);
+  font-size: .7rem;
+  font-weight: 950;
+  line-height: 1.15;
+  text-align: right;
+}
+.station-discount-note {
+  display: inline-flex;
+  width: fit-content;
+  margin: .48rem 0 0;
+  padding: .28rem .55rem;
+  border: 1px solid color-mix(in srgb, var(--brand-dark) 22%, transparent);
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--brand-dark);
+  font-size: .82rem;
+  font-weight: 950;
+}
+.discount-card {
+  display: grid;
+  gap: .9rem;
+  padding: 1.05rem 1.1rem;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 90% 0%, color-mix(in srgb, var(--brand) 12%, transparent), transparent 10rem),
+    var(--surface);
+}
+.discount-card-head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.discount-pill {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  padding: 0 .68rem;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--brand-dark);
+  font-size: .82rem;
+  font-weight: 950;
+  white-space: nowrap;
+}
+.discount-form {
+  display: grid;
+  gap: .42rem;
+}
+.discount-form label {
+  color: var(--muted);
+  font-size: .78rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: .035em;
+}
+.discount-input-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: .55rem;
+}
+.discount-input-row span {
+  color: var(--muted);
+  font-weight: 950;
+}
+.discount-input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 .85rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 16px;
+  background: var(--surface-soft);
+  color: var(--text);
+  font: inherit;
+  font-weight: 900;
+  outline: none;
+}
+.discount-input:focus {
+  border-color: color-mix(in srgb, var(--brand-dark) 52%, var(--border));
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand) 18%, transparent);
+}
+.discount-help {
+  margin: 0;
+  color: var(--muted);
+  font-size: .86rem;
+  line-height: 1.35;
+  font-weight: 750;
+}
+.fuel-price-current {
+  display: grid;
+  justify-items: end;
+  gap: .18rem;
+}
+.fuel-price-current strong { white-space: nowrap; }
+.fuel-price-current em {
+  color: var(--brand-dark);
+  font-size: .72rem;
+  font-style: normal;
+  font-weight: 950;
+  white-space: nowrap;
+}
+.price-marker.has-discount:not(.is-cheap) {
+  border-color: color-mix(in srgb, var(--brand-dark) 36%, rgba(255,255,255,.72));
+  color: var(--brand-dark);
+}
+.map-popup em {
+  display: block;
+  color: #087064;
+  font-size: .76rem;
+  font-style: normal;
+  font-weight: 900;
+}
+@media (max-width: 680px) {
+  .discount-input-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .discount-input-row .btn { grid-column: 1 / -1; width: 100%; }
+  .price-discount { max-width: 128px; }
+}
+
+/* v15 settings, location gate and tank-price mode */
+.location-gate {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+  padding: 1.15rem 1.2rem;
+  border-style: dashed;
+}
+.location-gate-icon {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border-radius: 19px;
+  background: var(--brand-soft);
+  color: var(--brand-dark);
+  font-size: 1.45rem;
+  font-weight: 950;
+}
+.location-gate h2 {
+  margin: 0 0 .25rem;
+  font-size: clamp(1.15rem, 3vw, 1.55rem);
+  letter-spacing: -.055em;
+}
+.location-gate p {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 750;
+  line-height: 1.35;
+}
+.location-gate-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .65rem;
+  margin-top: .85rem;
+}
+.settings-page {
+  gap: 1.05rem;
+}
+.settings-section {
+  display: grid;
+  gap: 1rem;
+}
+.location-settings {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .9rem;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--surface-soft) 80%, transparent);
+}
+.location-settings strong {
+  display: block;
+  font-size: 1.02rem;
+  letter-spacing: -.035em;
+}
+.settings-note {
+  margin: .15rem 0 0;
+  color: var(--muted);
+  font-size: .88rem;
+  line-height: 1.35;
+  font-weight: 720;
+}
+.brand-settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: .7rem;
+}
+.brand-setting-chip {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: .7rem;
+  padding: .72rem .78rem;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface-soft);
+}
+.brand-setting-chip > span {
+  font-weight: 950;
+  letter-spacing: -.03em;
+}
+.brand-setting-chip.is-favorite {
+  border-color: color-mix(in srgb, var(--brand-dark) 38%, var(--border));
+  background: var(--brand-soft);
+}
+.brand-setting-chip.is-hidden {
+  opacity: .72;
+  background: color-mix(in srgb, var(--danger, #ef4444) 7%, var(--surface-soft));
+}
+.brand-mode-select,
+.settings-input {
+  min-height: 38px;
+  border: 1px solid var(--border-strong);
+  border-radius: 13px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: .85rem;
+  font-weight: 850;
+  outline: none;
+}
+.brand-mode-select {
+  padding: 0 .55rem;
+}
+.settings-input {
+  width: min(160px, 100%);
+  padding: 0 .7rem;
+}
+.tank-settings {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: .85rem;
+  padding: .9rem;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--surface-soft) 80%, transparent);
+}
+.tank-settings label {
+  display: grid;
+  gap: .4rem;
+  color: var(--muted);
+  font-size: .82rem;
+  font-weight: 950;
+}
+.tank-settings .settings-note {
+  grid-column: 1 / -1;
+}
+.price-secondary,
+.fuel-price-secondary {
+  color: var(--muted);
+  font-size: .66rem;
+  font-weight: 850;
+  line-height: 1.05;
+}
+.radar-metric strong small {
+  display: block;
+  margin-top: .15rem;
+  color: var(--muted);
+  font-size: .68rem;
+  font-weight: 850;
+  letter-spacing: -.02em;
+}
+.brand-meta {
+  color: var(--brand-dark) !important;
+  background: var(--brand-soft);
+  border-color: color-mix(in srgb, var(--brand-dark) 20%, transparent);
+}
+@media (max-width: 760px) {
+  .location-gate { grid-template-columns: 1fr; }
+  .location-settings,
+  .tank-settings { grid-template-columns: 1fr; align-items: stretch; }
+  .location-settings .btn,
+  .tank-settings .btn { width: 100%; }
+  .brand-settings-grid { grid-template-columns: 1fr; }
+}

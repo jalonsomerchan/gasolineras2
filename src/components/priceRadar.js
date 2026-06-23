@@ -1,7 +1,9 @@
 import { NEARBY_RADIUS_KM } from '../config/constants.js';
+import { DiscountStore } from '../state/discountStore.js';
 import { FuelStore } from '../state/fuelStore.js';
 import { h } from '../utils/dom.js';
-import { numberValue, shortPrice } from '../utils/format.js';
+import { numberValue } from '../utils/format.js';
+import { displayFuelPrice, visibleStations } from '../utils/stationSettings.js';
 
 function avg(values) {
   const valid = values.filter((value) => value !== null);
@@ -10,15 +12,20 @@ function avg(values) {
 }
 
 function metric(label, value, tone = '') {
+  const display = displayFuelPrice(value);
   return h('div', { class: `radar-metric ${tone}` },
     h('span', {}, label),
-    h('strong', {}, shortPrice(value), h('small', {}, ' €/L'))
+    h('strong', {}, display.main, display.secondary ? h('small', {}, display.secondary) : null)
   );
 }
 
 export function PriceRadar(stations = [], locationLabel = '') {
   const fuel = FuelStore.current();
-  const prices = stations.map((station) => numberValue(station[fuel.priceField] ?? station.precio)).filter((value) => value && value > 0);
+  const list = visibleStations(stations);
+  const prices = list
+    .map((station) => DiscountStore.effectivePrice(station.ideess, station[fuel.priceField] ?? station.precio))
+    .map(numberValue)
+    .filter((value) => value && value > 0);
   const min = prices.length ? Math.min(...prices) : null;
   const max = prices.length ? Math.max(...prices) : null;
   const average = avg(prices);
@@ -35,7 +42,7 @@ export function PriceRadar(stations = [], locationLabel = '') {
     ),
     h('div', { class: 'radar-foot' },
       h('span', { class: 'live-dot', 'aria-hidden': 'true' }),
-      h('span', {}, `Mostrando ${stations.length || 0} estaciones para ${fuel.label}`)
+      h('span', {}, `Mostrando ${list.length || 0} estaciones para ${fuel.label}`)
     )
   );
 }

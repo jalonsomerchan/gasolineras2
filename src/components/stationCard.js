@@ -1,7 +1,9 @@
+import { DiscountStore } from '../state/discountStore.js';
 import { FavoritesStore } from '../state/favoritesStore.js';
 import { FuelStore } from '../state/fuelStore.js';
 import { h } from '../utils/dom.js';
-import { dateText, distance, numberValue, price, routePart, shortPrice, stationName } from '../utils/format.js';
+import { dateText, distance, numberValue, price, routePart, stationName } from '../utils/format.js';
+import { displayDelta, displayFuelPrice, stationBrand } from '../utils/stationSettings.js';
 
 function initials(name) {
   return String(name || 'G').trim().slice(0, 2).toUpperCase();
@@ -15,13 +17,17 @@ function priceDelta(currentPrice, cheapestPrice) {
   if (Math.abs(delta) < 0.0005) {
     return { label: 'Opción más barata', className: 'is-cheapest' };
   }
-  return { label: `+${shortPrice(delta)} €/L más cara`, className: 'is-more-expensive' };
+  return { label: `+${displayDelta(delta)} más cara`, className: 'is-more-expensive' };
 }
 
 export function StationCard(station, options = {}, index = 0) {
   const fuel = FuelStore.current();
   const isFavorite = FavoritesStore.has(station.ideess);
-  const currentPrice = station.precio ?? station[fuel.priceField];
+  const basePrice = station.precio ?? station[fuel.priceField];
+  const priceInfo = DiscountStore.priceInfo(station.ideess, basePrice);
+  const currentPrice = priceInfo.effective;
+  const displayCurrent = displayFuelPrice(currentPrice);
+  const displayOriginal = priceInfo.hasDiscount ? displayFuelPrice(priceInfo.original) : null;
   const title = stationName(station);
   const subtitle = [station.direccion, station.municipio].filter(Boolean).join(' · ');
   const delta = priceDelta(currentPrice, options.cheapestPrice);
@@ -39,13 +45,14 @@ export function StationCard(station, options = {}, index = 0) {
     }
   }, isFavorite ? '★' : '☆');
 
-  return h('article', { class: `station-card ${options.compact ? 'is-compact' : ''}` },
+  return h('article', { class: `station-card ${options.compact ? 'is-compact' : ''} ${priceInfo.hasDiscount ? 'has-discount' : ''}` },
     options.ranked ? h('div', { class: `rank ${index < 3 ? 'is-top' : ''}` }, String(index + 1)) : null,
     h('a', { class: 'station-logo', href: `#/gasolinera/${station.ideess}`, 'aria-hidden': 'true' }, initials(title)),
     h('div', { class: 'station-main' },
       h('h3', { class: 'station-title' }, h('a', { href: `#/gasolinera/${station.ideess}` }, title)),
       h('p', { class: 'station-meta' }, subtitle || 'Sin dirección'),
       h('div', { class: 'station-actions' },
+        h('span', { class: 'mini-meta brand-meta' }, stationBrand(station)),
         station.distancia_km !== undefined ? h('span', { class: 'mini-meta' }, distance(station.distancia_km)) : null,
         station.fecha ? h('span', { class: 'mini-meta' }, dateText(station.fecha)) : null,
         station.municipio ? h('a', { class: 'mini-meta', href: `#/municipio/${routePart(station.provincia)}/${routePart(station.municipio)}` }, station.municipio) : null,
@@ -55,11 +62,14 @@ export function StationCard(station, options = {}, index = 0) {
     h('div', { class: 'price-box' },
       h('div', { class: 'price-line' },
         h('a', { class: 'price-link', href: `#/gasolinera/${station.ideess}` },
-          h('div', { class: 'price-value' }, price(currentPrice)),
-          h('div', { class: 'price-label' }, fuel.shortLabel)
+          priceInfo.hasDiscount ? h('div', { class: 'price-original' }, displayOriginal?.main || price(priceInfo.original)) : null,
+          h('div', { class: 'price-value' }, displayCurrent.main),
+          h('div', { class: 'price-label' }, displayCurrent.isTank ? displayCurrent.unit : fuel.shortLabel),
+          displayCurrent.secondary ? h('div', { class: 'price-secondary' }, displayCurrent.secondary) : null
         ),
         favoriteButton
       ),
+      priceInfo.hasDiscount ? h('div', { class: 'price-discount' }, `Dto. -${DiscountStore.formatCents(priceInfo.discountCents)} c/L aplicado`) : null,
       delta ? h('div', { class: `price-delta ${delta.className}` }, delta.label) : null
     )
   );

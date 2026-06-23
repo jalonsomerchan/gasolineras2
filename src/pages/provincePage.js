@@ -1,7 +1,8 @@
 import { Api } from '../services/api.js';
 import { FuelStore } from '../state/fuelStore.js';
 import { h, loading, errorBox, clear } from '../utils/dom.js';
-import { integer, price, routePart } from '../utils/format.js';
+import { integer, routePart } from '../utils/format.js';
+import { displayFuelPrice } from '../utils/stationSettings.js';
 import { Breadcrumbs } from '../components/breadcrumbs.js';
 import { MapView } from '../components/mapView.js';
 import { StationList } from '../components/stationList.js';
@@ -38,7 +39,7 @@ export function ProvincePage(params) {
     const fuel = FuelStore.current();
     return h('a', { class: 'soft-card municipality-card', href: `#/municipio/${routePart(item.provincia)}/${routePart(item.municipio)}` },
       h('strong', {}, item.municipio),
-      h('p', { class: 'station-meta' }, `${integer(item.total_gasolineras)} gasolineras · media ${price(item[fuel.priceField])}`)
+      h('p', { class: 'station-meta' }, `${integer(item.total_gasolineras)} gasolineras · media ${displayFuelPrice(item[fuel.priceField]).main}`)
     );
   }
 
@@ -56,7 +57,7 @@ export function ProvincePage(params) {
           StatsGrid([
             { label: 'Gasolineras', value: integer(stats?.total_gasolineras) },
             { label: 'Municipios', value: integer(stats?.total_municipios) },
-            { label: `Media ${fuel.shortLabel}`, value: price(stats?.[fuel.priceField]) }
+            { label: `Media ${fuel.shortLabel}`, value: displayFuelPrice(stats?.[fuel.priceField]).main }
           ])
         )
       ),
