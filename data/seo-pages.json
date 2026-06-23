@@ -1,0 +1,28 @@
+{
+  "pages": [
+    {
+      "path": "/diesel/madrid/",
+      "route": "/provincia/Madrid",
+      "fuel": "gasoleo_a",
+      "title": "Precio del diésel en Madrid",
+      "h1": "Diésel en Madrid",
+      "description": "Consulta el precio del diésel en Madrid y encuentra las gasolineras más baratas."
+    },
+    {
+      "path": "/gasolina-95/caceres/",
+      "route": "/provincia/C%C3%81CERES",
+      "fuel": "gasolina_95",
+      "title": "Precio de Gasolina 95 en Cáceres",
+      "h1": "Gasolina 95 en Cáceres",
+      "description": "Consulta el precio de Gasolina 95 en Cáceres y compara gasolineras por precio, cercanía y descuentos."
+    },
+    {
+      "path": "/gasolina-98/madrid/",
+      "route": "/provincia/Madrid",
+      "fuel": "gasolina_98",
+      "title": "Precio de Gasolina 98 en Madrid",
+      "h1": "Gasolina 98 en Madrid",
+      "description": "Consulta el precio de Gasolina 98 en Madrid y encuentra las mejores opciones para repostar."
+    }
+  ]
+}
