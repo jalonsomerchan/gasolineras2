@@ -1,12 +1,12 @@
 {
-  "name": "Gasolineras2",
+  "name": "Gasolina al día",
   "short_name": "Gasolina",
   "description": "Consulta precios de gasolina y diésel cerca de ti.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f8fafc",
-  "theme_color": "#0f766e",
+  "background_color": "#041412",
+  "theme_color": "#041412",
   "orientation": "portrait-primary",
   "icons": [
     {

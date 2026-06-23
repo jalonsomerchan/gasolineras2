@@ -5,11 +5,17 @@ function runtimeConfig() {
 }
 
 function apiBase() {
-  return (runtimeConfig().apiBase || DEFAULT_API_BASE).replace(/\/+$/, '');
+  const config = runtimeConfig();
+  return (config.apiBase || config.API_BASE_URL || DEFAULT_API_BASE).replace(/\/+$/, '');
+}
+
+function apiKey() {
+  const config = runtimeConfig();
+  return config.apiKey || config.API_KEY || '';
 }
 
 function authHeaders() {
-  const key = runtimeConfig().apiKey || '';
+  const key = apiKey();
   return key ? { Authorization: `Bearer ${key}`, 'X-API-Key': key } : {};
 }
 
@@ -29,6 +35,9 @@ async function request(endpoint, params = {}) {
 }
 
 export const Api = {
+  hasKey() {
+    return Boolean(apiKey());
+  },
   autocomplete(q, type = 'all', limit = 10) {
     return request('autocomplete', { q, type, limit });
   },

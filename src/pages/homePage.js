@@ -7,17 +7,20 @@ import { h, loading, errorBox, clear } from '../utils/dom.js';
 import { numberValue } from '../utils/format.js';
 import { EmptyState } from '../components/emptyState.js';
 import { MapView } from '../components/mapView.js';
+import { PriceRadar } from '../components/priceRadar.js';
 import { SearchBox } from '../components/searchBox.js';
 import { SortToggle } from '../components/sortToggle.js';
 import { StationList } from '../components/stationList.js';
 
 export function HomePage() {
+  const radarContainer = h('div', {}, loading('Calculando radar de precios...'));
   const favoriteContainer = h('div', {}, loading('Cargando favoritos...'));
   const nearbyContainer = h('div', {}, loading('Buscando gasolineras cercanas...'));
   const sortContainer = h('div');
+  const locationText = h('span', { class: 'muted' }, 'Detectando ubicación...');
   let nearbyStations = [];
   let currentLocation = null;
-  let sortBy = 'distance';
+  let sortBy = 'price';
 
   function sortedStations() {
     const fuel = FuelStore.current();
@@ -27,9 +30,15 @@ export function HomePage() {
     });
   }
 
+  function renderRadar() {
+    clear(radarContainer);
+    radarContainer.append(PriceRadar(nearbyStations, currentLocation?.label || ''));
+  }
+
   function renderNearby() {
     clear(nearbyContainer);
     clear(sortContainer);
+    renderRadar();
     if (!nearbyStations.length) {
       nearbyContainer.append(EmptyState('No se han encontrado gasolineras cercanas.'));
       return;
@@ -40,8 +49,8 @@ export function HomePage() {
     }));
     const sorted = sortedStations();
     nearbyContainer.append(
-      MapView(sorted, { center: currentLocation }),
-      StationList(sorted, { emptyMessage: 'No hay gasolineras cercanas.' })
+      h('div', { id: 'nearby-map', class: 'map-preview-card' }, MapView(sorted, { center: currentLocation, small: true })),
+      StationList(sorted.slice(0, 12), { emptyMessage: 'No hay gasolineras cercanas.', ranked: true })
     );
   }
 
@@ -62,9 +71,12 @@ export function HomePage() {
 
   async function loadNearby() {
     clear(nearbyContainer);
+    clear(radarContainer);
+    radarContainer.append(loading('Obteniendo precios cercanos...'));
     nearbyContainer.append(loading('Obteniendo ubicación...'));
     try {
       currentLocation = await getBestLocation();
+      locationText.textContent = currentLocation.label || 'Cerca de ti';
       clear(nearbyContainer);
       nearbyContainer.append(loading(`Buscando cerca de ${currentLocation.label}...`));
       nearbyStations = await Api.nearby({
@@ -72,30 +84,45 @@ export function HomePage() {
         longitud: currentLocation.longitud,
         combustible: FuelStore.get(),
         limit: NEARBY_LIMIT,
-        radio_km: NEARBY_RADIUS_KM
+        radio_km: NEARBY_RADIUS_KM,
+        order: 'precio_asc'
       });
       renderNearby();
     } catch (error) {
+      clear(radarContainer);
       clear(nearbyContainer);
-      nearbyContainer.append(errorBox(error.message));
+      const message = !Api.hasKey()
+        ? 'No hay API key configurada. En local edita config.js; en GitHub Pages revisa el secret GASOLINA_API_KEY.'
+        : error.message;
+      radarContainer.append(errorBox(message));
+      nearbyContainer.append(errorBox(message));
     }
   }
 
-  const page = h('div', { class: 'stack' },
-    h('section', { class: 'hero' },
-      h('h1', {}, 'Encuentra el mejor precio cerca de ti'),
-      h('p', {}, 'Busca por municipio, provincia o gasolinera y compara precios actuales según el combustible seleccionado.'),
+  const page = h('div', { class: 'dashboard' },
+    h('section', { class: 'top-panel' },
+      h('div', { class: 'headline-row' },
+        h('div', {}, h('h1', {}, 'Gasolina al día'), h('p', {}, 'Precios cercanos y favoritos en una vista rápida.')),
+        h('div', { class: 'location-chip' }, h('span', { 'aria-hidden': 'true' }, '⌖'), locationText)
+      ),
       SearchBox()
     ),
-    h('section', { class: 'section' },
+    radarContainer,
+    h('section', { class: 'filters-row', 'aria-label': 'Filtros rápidos' },
+      h('span', { class: 'filter-chip is-active' }, '📍 35 km'),
+      h('span', { class: 'filter-chip' }, 'Provincia'),
+      h('span', { class: 'filter-chip' }, 'Municipio'),
+      h('span', { class: 'filter-chip' }, 'Más filtros')
+    ),
+    h('section', { id: 'favorites', class: 'glass-section' },
       h('div', { class: 'section-head' },
         h('div', {}, h('h2', { class: 'section-title' }, 'Mis favoritos'), h('p', { class: 'section-subtitle' }, 'Guardados solo en este dispositivo.'))
       ),
       favoriteContainer
     ),
-    h('section', { class: 'section' },
+    h('section', { class: 'glass-section' },
       h('div', { class: 'section-head' },
-        h('div', {}, h('h2', { class: 'section-title' }, 'Gasolineras cercanas'), h('p', { class: 'section-subtitle' }, 'Primero intentamos usar la ubicación del dispositivo; si falla, usamos ubicación por IP.')),
+        h('div', {}, h('h2', { class: 'section-title' }, 'Estaciones cercanas'), h('p', { class: 'section-subtitle' }, 'Ubicación del dispositivo o fallback por IP.')),
         sortContainer
       ),
       nearbyContainer

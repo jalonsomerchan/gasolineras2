@@ -10,6 +10,6 @@ export function FuelToggle() {
       type: 'button',
       'aria-pressed': fuel.id === current ? 'true' : 'false',
       onClick: () => FuelStore.set(fuel.id)
-    }, fuel.shortLabel))
+    }, h('span', { 'aria-hidden': 'true' }, fuel.id === 'gasoleo_a' ? '◆' : '⛽'), h('span', {}, fuel.label)))
   );
 }

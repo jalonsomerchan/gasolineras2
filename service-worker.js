@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gasolineras2-v1';
+const CACHE_NAME = 'gasolineras2-v3';
 const APP_SHELL = [
   './',
   './index.html',
@@ -16,13 +16,19 @@ const APP_SHELL = [
   './src/config/fuels.js',
   './src/services/api.js',
   './src/services/location.js',
+  './src/services/leafletLoader.js',
   './src/state/storage.js',
   './src/state/fuelStore.js',
   './src/state/favoritesStore.js',
+  './src/state/themeStore.js',
   './src/utils/dom.js',
   './src/utils/format.js',
   './src/utils/geo.js',
   './src/components/appShell.js',
+  './src/components/themeToggle.js',
+  './src/components/bottomNav.js',
+  './src/components/priceRadar.js',
+  './src/components/locationBadge.js',
   './src/components/breadcrumbs.js',
   './src/components/emptyState.js',
   './src/components/fuelToggle.js',

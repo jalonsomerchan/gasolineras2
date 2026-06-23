@@ -1,69 +1,54 @@
-# Gasolineras2 PWA
+# Gasolina al día
 
-PWA estática en HTML, CSS y JavaScript para consultar precios de Gasolina 95, Diésel/Gasóleo A y Gasolina 98 usando la API `https://alon.one/api/gasolina2/`.
+PWA estática para consultar precios de gasolina 95, gasóleo A y gasolina 98 usando la API `https://alon.one/api/gasolina2`.
 
-## Funcionalidades
-
-- Selector global de combustible tipo toggle, persistido en `localStorage`.
-- Portada con buscador único para provincia, municipio o gasolinera.
-- Favoritos guardados en `localStorage`.
-- Localización por GPS y fallback con `ip-api.com`.
-- Mapa de gasolineras cercanas con Leaflet y OpenStreetMap.
-- Listado de cercanas ordenable por cercanía o precio.
-- Página propia para gasolinera.
-- Página propia para municipio.
-- Página propia para provincia.
-- PWA instalable con manifest y service worker.
-- Componentes y servicios separados en ficheros pequeños.
-
-## Configurar API key
-
-Para desarrollo local:
+## Probar en local
 
 ```bash
-cp config.example.js config.js
+python3 -m http.server 8000
 ```
 
-Edita `config.js`:
+Abre `http://localhost:8000`.
+
+Crea o edita `config.js`:
 
 ```js
 window.GASOLINA_CONFIG = {
   apiBase: 'https://alon.one/api/gasolina2',
-  apiKey: 'TU_API_KEY'
+  apiKey: 'TU_API_KEY_AQUI',
+  API_BASE_URL: 'https://alon.one/api/gasolina2',
+  API_KEY: 'TU_API_KEY_AQUI'
 };
 ```
 
-Para GitHub Pages, crea el secret del repositorio:
+La aplicación acepta tanto `apiKey/apiBase` como `API_KEY/API_BASE_URL`.
 
-```text
-GASOLINA_API_KEY
-```
+## GitHub Pages + secret
 
-El workflow `.github/workflows/deploy.yml` generará `config.js` automáticamente en el despliegue.
+1. En GitHub ve a `Settings > Secrets and variables > Actions > New repository secret`.
+2. Crea `GASOLINA_API_KEY` con la clave real.
+3. En `Settings > Pages`, selecciona `Build and deployment > Source: GitHub Actions`.
+4. Haz push a `main` o ejecuta manualmente el workflow `Deploy PWA to GitHub Pages`.
 
-> Nota: al ser una PWA 100% estática en GitHub Pages, cualquier API key usada en el navegador acaba siendo visible para el usuario final. El secret evita guardarla en el repositorio, pero no la convierte en privada en runtime. Para ocultarla de verdad haría falta un proxy backend/serverless.
+El workflow genera `config.js` durante el despliegue. Si el secret no está disponible, el despliegue falla con un error explícito para que no se publique una app sin API key.
 
 ## Estructura
 
-```text
-src/
-  app.js
-  router.js
-  config/
-  services/
-  state/
-  utils/
-  components/
-  pages/
-  styles/
-```
+- `src/config`: constantes y combustibles.
+- `src/services`: API, ubicación y carga de Leaflet.
+- `src/state`: localStorage para combustible, favoritos y tema.
+- `src/components`: piezas reutilizables pequeñas.
+- `src/pages`: portada y páginas de gasolinera, municipio y provincia.
+- `src/styles`: base, layout y componentes.
 
-## Ejecutar en local
+## Funcionalidades
 
-Sirve la carpeta con cualquier servidor estático:
-
-```bash
-python3 -m http.server 8080
-```
-
-Abre `http://localhost:8080`.
+- PWA instalable.
+- Diseño light/dark con selector.
+- Selector persistente de combustible.
+- Buscador de municipio, provincia o gasolinera.
+- Favoritos en localStorage.
+- Radar de precios cercano.
+- Mapa de gasolineras cercanas con Leaflet y fallback de CDN.
+- Orden por precio o cercanía.
+- Páginas propias para gasolinera, municipio y provincia.

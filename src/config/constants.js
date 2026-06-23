@@ -1,4 +1,4 @@
-export const APP_NAME = 'Gasolineras2';
+export const APP_NAME = 'Gasolina al día';
 export const DEFAULT_API_BASE = 'https://alon.one/api/gasolina2';
 export const DEFAULT_POSITION = {
   latitud: 40.4168,
