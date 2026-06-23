@@ -1,0 +1,71 @@
+const CACHE_NAME = 'gasolineras2-v1';
+const APP_SHELL = [
+  './',
+  './index.html',
+  './manifest.webmanifest',
+  './config.js',
+  './assets/icon.svg',
+  './assets/icon-192.png',
+  './assets/icon-512.png',
+  './src/styles/base.css',
+  './src/styles/layout.css',
+  './src/styles/components.css',
+  './src/app.js',
+  './src/router.js',
+  './src/config/constants.js',
+  './src/config/fuels.js',
+  './src/services/api.js',
+  './src/services/location.js',
+  './src/state/storage.js',
+  './src/state/fuelStore.js',
+  './src/state/favoritesStore.js',
+  './src/utils/dom.js',
+  './src/utils/format.js',
+  './src/utils/geo.js',
+  './src/components/appShell.js',
+  './src/components/breadcrumbs.js',
+  './src/components/emptyState.js',
+  './src/components/fuelToggle.js',
+  './src/components/mapView.js',
+  './src/components/searchBox.js',
+  './src/components/sortToggle.js',
+  './src/components/stationCard.js',
+  './src/components/stationList.js',
+  './src/components/statsGrid.js',
+  './src/pages/homePage.js',
+  './src/pages/municipalityPage.js',
+  './src/pages/notFoundPage.js',
+  './src/pages/provincePage.js',
+  './src/pages/stationPage.js'
+];
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)));
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))))
+  );
+  self.clients.claim();
+});
+
+self.addEventListener('fetch', (event) => {
+  const request = event.request;
+  if (request.method !== 'GET') return;
+
+  const url = new URL(request.url);
+  if (url.hostname.includes('alon.one')) {
+    event.respondWith(fetch(request).catch(() => caches.match(request)));
+    return;
+  }
+
+  event.respondWith(
+    caches.match(request).then((cached) => cached || fetch(request).then((response) => {
+      const clone = response.clone();
+      caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+      return response;
+    }))
+  );
+});

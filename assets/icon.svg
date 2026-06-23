@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Gasolineras2">
+  <rect width="512" height="512" rx="112" fill="#ecfeff"/>
+  <path d="M148 396V150c0-31 25-56 56-56h92c31 0 56 25 56 56v246" fill="#0f766e"/>
+  <path d="M188 174c0-14 11-25 25-25h74c14 0 25 11 25 25v69H188v-69Z" fill="#f8fafc"/>
+  <path d="M345 178h32c21 0 38 17 38 38v134c0 29-23 52-52 52h-18v-54h18c-1 0 0 0 0 0V226h-18v-48Z" fill="#14b8a6"/>
+  <path d="M393 180l-38-52 31-22 43 58v63h-36v-47Z" fill="#0f766e"/>
+  <path d="M119 396h262c15 0 27 12 27 27v15H92v-15c0-15 12-27 27-27Z" fill="#115e59"/>
+  <circle cx="218" cy="306" r="18" fill="#fbbf24"/>
+  <path d="M250 306h58" stroke="#fbbf24" stroke-width="24" stroke-linecap="round"/>
+</svg>
