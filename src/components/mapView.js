@@ -181,7 +181,7 @@ function addStationMarkers(L, map, bounds, stations, markers = []) {
     .forEach(([station, coords]) => {
       bounds.push(coords);
       const basePrice = station.precio ?? station[fuel.priceField];
-      const priceInfo = DiscountStore.priceInfo(station.ideess, basePrice);
+      const priceInfo = DiscountStore.priceInfo(station, basePrice);
       const currentPrice = priceInfo.effective;
       const marker = L.marker(coords, { icon: priceIcon(L, currentPrice, String(station.ideess) === String(cheapest?.ideess), priceInfo.hasDiscount) })
         .addTo(map)
@@ -194,7 +194,7 @@ function addStationMarkers(L, map, bounds, stations, markers = []) {
 function stationPrice(station) {
   const fuel = FuelStore.current();
   const basePrice = station?.precio ?? station?.[fuel.priceField];
-  return numberValue(DiscountStore.effectivePrice(station?.ideess, basePrice));
+  return numberValue(DiscountStore.effectivePrice(station, basePrice));
 }
 
 function cheapestStation(stations = []) {
@@ -249,7 +249,7 @@ function popupHtml(station, priceInfo) {
   const display = displayFuelPrice(priceInfo?.effective);
   const originalDisplay = priceInfo?.hasDiscount ? displayFuelPrice(priceInfo.original) : null;
   const discount = priceInfo?.hasDiscount
-    ? `<em>Descuento -${escapeHtml(DiscountStore.formatCents(priceInfo.discountCents))} c/L aplicado</em>`
+    ? `<em>${escapeHtml(DiscountStore.discountDescription(priceInfo))}</em>`
     : '';
   const original = priceInfo?.hasDiscount
     ? `<small>Antes: ${escapeHtml(originalDisplay.main || price(priceInfo.original))}</small>`

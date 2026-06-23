@@ -9,7 +9,7 @@ import { StationCard } from './stationCard.js';
 function stationPrice(station) {
   const fuel = FuelStore.current();
   const basePrice = station?.precio ?? station?.[fuel.priceField];
-  return numberValue(DiscountStore.effectivePrice(station?.ideess, basePrice));
+  return numberValue(DiscountStore.effectivePrice(station, basePrice));
 }
 
 function cheapestPrice(stations) {

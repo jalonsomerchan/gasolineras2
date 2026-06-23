@@ -24,7 +24,7 @@ export function StationCard(station, options = {}, index = 0) {
   const fuel = FuelStore.current();
   const isFavorite = FavoritesStore.has(station.ideess);
   const basePrice = station.precio ?? station[fuel.priceField];
-  const priceInfo = DiscountStore.priceInfo(station.ideess, basePrice);
+  const priceInfo = DiscountStore.priceInfo(station, basePrice);
   const currentPrice = priceInfo.effective;
   const displayCurrent = displayFuelPrice(currentPrice);
   const displayOriginal = priceInfo.hasDiscount ? displayFuelPrice(priceInfo.original) : null;
@@ -69,7 +69,7 @@ export function StationCard(station, options = {}, index = 0) {
         ),
         favoriteButton
       ),
-      priceInfo.hasDiscount ? h('div', { class: 'price-discount' }, `Dto. -${DiscountStore.formatCents(priceInfo.discountCents)} c/L aplicado`) : null,
+      priceInfo.hasDiscount ? h('div', { class: 'price-discount' }, DiscountStore.discountDescription(priceInfo)) : null,
       delta ? h('div', { class: `price-delta ${delta.className}` }, delta.label) : null
     )
   );

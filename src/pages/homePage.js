@@ -17,7 +17,7 @@ import { LocationGate } from '../components/locationGate.js';
 
 function bestPrice(stations) {
   const fuel = FuelStore.current();
-  const prices = stations.map((station) => numberValue(DiscountStore.effectivePrice(station.ideess, station[fuel.priceField] ?? station.precio))).filter((value) => value && value > 0);
+  const prices = stations.map((station) => numberValue(DiscountStore.effectivePrice(station, station[fuel.priceField] ?? station.precio))).filter((value) => value && value > 0);
   return prices.length ? Math.min(...prices) : null;
 }
 
@@ -51,7 +51,7 @@ export function HomePage() {
   function sortedStations() {
     const fuel = FuelStore.current();
     return [...nearbyStations].sort((a, b) => {
-      if (sortBy === 'price') return (numberValue(DiscountStore.effectivePrice(a.ideess, a[fuel.priceField] ?? a.precio)) ?? 999) - (numberValue(DiscountStore.effectivePrice(b.ideess, b[fuel.priceField] ?? b.precio)) ?? 999);
+      if (sortBy === 'price') return (numberValue(DiscountStore.effectivePrice(a, a[fuel.priceField] ?? a.precio)) ?? 999) - (numberValue(DiscountStore.effectivePrice(b, b[fuel.priceField] ?? b.precio)) ?? 999);
       return (numberValue(a.distancia_km) ?? 999) - (numberValue(b.distancia_km) ?? 999);
     });
   }
@@ -108,7 +108,7 @@ export function HomePage() {
     }
     try {
       const fuel = FuelStore.current();
-      const stations = (await Api.stationsDetail(ids)).sort((a, b) => (numberValue(DiscountStore.effectivePrice(a.ideess, a[fuel.priceField] ?? a.precio)) ?? 999) - (numberValue(DiscountStore.effectivePrice(b.ideess, b[fuel.priceField] ?? b.precio)) ?? 999));
+      const stations = (await Api.stationsDetail(ids)).sort((a, b) => (numberValue(DiscountStore.effectivePrice(a, a[fuel.priceField] ?? a.precio)) ?? 999) - (numberValue(DiscountStore.effectivePrice(b, b[fuel.priceField] ?? b.precio)) ?? 999));
       favoriteContainer.append(StationList(stations.slice(0, 6), { onFavoriteChange: loadFavorites, ranked: true, sortByPrice: true, emptyMessage: 'No tienes favoritos guardados.' }));
     } catch (error) {
       favoriteContainer.append(errorBox(error.message));

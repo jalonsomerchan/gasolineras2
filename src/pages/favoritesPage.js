@@ -19,7 +19,7 @@ export function FavoritesPage() {
     try {
       const fuel = FuelStore.current();
       const stations = (await Api.stationsDetail(ids))
-        .sort((a, b) => (numberValue(DiscountStore.effectivePrice(a.ideess, a[fuel.priceField] ?? a.precio)) ?? 999) - (numberValue(DiscountStore.effectivePrice(b.ideess, b[fuel.priceField] ?? b.precio)) ?? 999));
+        .sort((a, b) => (numberValue(DiscountStore.effectivePrice(a, a[fuel.priceField] ?? a.precio)) ?? 999) - (numberValue(DiscountStore.effectivePrice(b, b[fuel.priceField] ?? b.precio)) ?? 999));
       clear(listContainer).append(StationList(stations, {
         ranked: true,
         sortByPrice: true,

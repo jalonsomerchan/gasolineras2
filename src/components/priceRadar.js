@@ -23,7 +23,7 @@ export function PriceRadar(stations = [], locationLabel = '') {
   const fuel = FuelStore.current();
   const list = visibleStations(stations);
   const prices = list
-    .map((station) => DiscountStore.effectivePrice(station.ideess, station[fuel.priceField] ?? station.precio))
+    .map((station) => DiscountStore.effectivePrice(station, station[fuel.priceField] ?? station.precio))
     .map(numberValue)
     .filter((value) => value && value > 0);
   const min = prices.length ? Math.min(...prices) : null;

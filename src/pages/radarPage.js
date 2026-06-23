@@ -40,7 +40,7 @@ export function RadarPage() {
   function sortedStations() {
     const fuel = FuelStore.current();
     return [...stations].sort((a, b) => {
-      if (sortBy === 'price') return (numberValue(DiscountStore.effectivePrice(a.ideess, a[fuel.priceField] ?? a.precio)) ?? 999) - (numberValue(DiscountStore.effectivePrice(b.ideess, b[fuel.priceField] ?? b.precio)) ?? 999);
+      if (sortBy === 'price') return (numberValue(DiscountStore.effectivePrice(a, a[fuel.priceField] ?? a.precio)) ?? 999) - (numberValue(DiscountStore.effectivePrice(b, b[fuel.priceField] ?? b.precio)) ?? 999);
       return (numberValue(a.distancia_km) ?? 999) - (numberValue(b.distancia_km) ?? 999);
     });
   }
