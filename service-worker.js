@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gasolineras2-v18';
+const CACHE_NAME = 'gasolineras2-v19';
 const APP_SHELL = [
   './',
   './index.html',
@@ -44,6 +44,11 @@ const APP_SHELL = [
   './src/components/statsGrid.js',
   './src/components/trendCard.js',
   './src/components/historicalChart.js',
+  './src/components/historicalExplorer.js',
+  './src/components/installPrompt.js',
+  './src/components/sharePrice.js',
+  './src/components/navigationActions.js',
+  './src/state/recentSearchStore.js',
   './src/pages/homePage.js',
   './src/pages/radarPage.js',
   './src/pages/favoritesPage.js',

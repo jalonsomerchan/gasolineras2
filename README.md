@@ -61,3 +61,13 @@ El workflow genera `config.js` durante el despliegue. Si el secret no está disp
 - Geolocalización reforzada: primero GPS fresco, después última ubicación guardada, después IP y por último Madrid.
 - Botón circular junto a la ubicación para forzar de nuevo la detección.
 - Caché PWA actualizada a `gasolineras2-v5`.
+
+## Cambios de la versión v19
+
+- Botones de navegación en la ficha de gasolinera: Cómo llegar, Google Maps, Apple Maps y Waze.
+- Comparador avanzado de favoritos con tabla, precio actual, precio con descuentos, diferencia con la más barata, diferencia con la media, última actualización y coste del depósito.
+- Buscador avanzado con búsquedas recientes, sugerencias, filtros por tipo y resultados agrupados por gasolinera, municipio y provincia.
+- Histórico con selector de periodo: 7 días, 30 días, 90 días y 1 año, con mínimo, máximo, media, tendencia y mejor día para repostar.
+- Compartir precio desde la ficha: copiar enlace, compartir nativo, WhatsApp y Telegram.
+- Banner de instalación PWA con indicaciones para iPhone/Android.
+- Script base para generar páginas estáticas SEO: copia `data/seo-pages.example.json` a `data/seo-pages.json` y ejecuta `npm run seo:pages`.

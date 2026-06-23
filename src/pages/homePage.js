@@ -14,6 +14,7 @@ import { SortToggle } from '../components/sortToggle.js';
 import { StationList } from '../components/stationList.js';
 import { TrendCard } from '../components/trendCard.js';
 import { LocationGate } from '../components/locationGate.js';
+import { InstallPrompt } from '../components/installPrompt.js';
 
 function bestPrice(stations) {
   const fuel = FuelStore.current();
@@ -196,7 +197,8 @@ export function HomePage() {
       nearbyContainer
     ),
     mapContainer,
-    trendContainer
+    trendContainer,
+    InstallPrompt()
   );
 
   loadFavorites();

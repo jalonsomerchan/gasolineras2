@@ -9,7 +9,9 @@ import { displayDelta, displayFuelPrice, stationBrand } from '../utils/stationSe
 import { Breadcrumbs } from '../components/breadcrumbs.js';
 import { MapView } from '../components/mapView.js';
 import { StationList } from '../components/stationList.js';
-import { HistoricalChart } from '../components/historicalChart.js';
+import { HistoricalExplorer } from '../components/historicalExplorer.js';
+import { NavigationActions } from '../components/navigationActions.js';
+import { SharePrice } from '../components/sharePrice.js';
 
 function dateNDaysAgo(days) {
   const date = new Date();
@@ -260,11 +262,15 @@ export function StationPage(params) {
           )
         )
       ),
+      NavigationActions(station),
       FuelPricesSummary(station),
-      HistoricalChart(trendRows, {
+      SharePrice(station),
+      HistoricalExplorer({
+        heading: 'Histórico de precios',
         title: `Histórico ${fuel.label} en esta gasolinera`,
         subtitle: stationName(station),
-        limit: 30,
+        initialRows: trendRows,
+        filters: { ideess: params.ideess },
         ariaLabel: `Histórico de precios de ${stationName(station)}`
       }),
       h('section', { class: 'section' },

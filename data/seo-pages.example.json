@@ -1,0 +1,26 @@
+[
+  {
+    "path": "/provincia/caceres/",
+    "hashRoute": "#/provincia/CÁCERES",
+    "title": "Precio de gasolina y diésel en Cáceres",
+    "description": "Consulta gasolineras, precios actuales e histórico en la provincia de Cáceres."
+  },
+  {
+    "path": "/municipio/caceres/caceres/",
+    "hashRoute": "#/municipio/CÁCERES/Cáceres",
+    "title": "Gasolineras en Cáceres",
+    "description": "Listado de gasolineras y precios actuales en Cáceres."
+  },
+  {
+    "path": "/gasolinera/12345/",
+    "hashRoute": "#/gasolinera/12345",
+    "title": "Ficha de gasolinera 12345",
+    "description": "Precio actual, histórico y mapa de la gasolinera."
+  },
+  {
+    "path": "/diesel/madrid/",
+    "hashRoute": "#/provincia/Madrid",
+    "title": "Diésel en Madrid",
+    "description": "Consulta el precio del diésel en Madrid."
+  }
+]

@@ -7,7 +7,7 @@ import { Breadcrumbs } from '../components/breadcrumbs.js';
 import { MapView } from '../components/mapView.js';
 import { StationList } from '../components/stationList.js';
 import { StatsGrid } from '../components/statsGrid.js';
-import { HistoricalChart } from '../components/historicalChart.js';
+import { HistoricalExplorer } from '../components/historicalExplorer.js';
 
 function dateNDaysAgo(days) {
   const date = new Date();
@@ -61,10 +61,12 @@ export function ProvincePage(params) {
           ])
         )
       ),
-      HistoricalChart(trendRows, {
+      HistoricalExplorer({
+        heading: 'Histórico provincial',
         title: `Histórico ${fuel.label} en ${provincia}`,
-        subtitle: `Media diaria provincial`,
-        limit: 30,
+        subtitle: 'Media diaria provincial',
+        initialRows: trendRows,
+        filters: { provincia },
         ariaLabel: `Histórico de precios en ${provincia}`
       }),
       h('section', { class: 'section' },
