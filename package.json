@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "seo:pages": "node scripts/generate-seo-pages.js"
+  },
+  "devDependencies": {}
+}
