@@ -271,3 +271,56 @@
   .header-location-pill { max-width: 122px; min-height: 38px; font-size: .82rem; }
   .icon-button { width: 38px; height: 38px; min-height: 38px; }
 }
+
+/* v8 compact desktop/mobile scale */
+.header-inner {
+  width: min(100% - 1.1rem, var(--max-width));
+  padding: .72rem 0 .36rem;
+}
+.brand {
+  font-size: clamp(1.28rem, 4vw, 1.62rem);
+  letter-spacing: -.065em;
+}
+.header-location-pill {
+  min-height: 36px;
+  max-width: min(34vw, 142px);
+  padding: 0 .64rem;
+  font-size: .78rem;
+}
+.header-location-icon { font-size: .9rem; }
+.icon-button {
+  width: 36px;
+  height: 36px;
+  min-height: 36px;
+  font-size: .92rem;
+}
+.fuel-row {
+  width: min(100% - 1.1rem, var(--max-width));
+  padding-bottom: .42rem;
+}
+.main {
+  width: min(100% - 1.1rem, var(--max-width));
+  padding: .12rem 0 5.45rem;
+}
+.dashboard.home-radar { gap: .54rem; }
+.glass-section {
+  padding: .62rem .72rem .18rem;
+  border-radius: 17px;
+}
+.section, .glass-section { gap: .56rem; }
+.section-head { gap: .55rem; }
+.section-title { font-size: .9rem; }
+.section-subtitle { font-size: .72rem; }
+.hero {
+  padding: .9rem !important;
+  border-radius: 18px !important;
+}
+.hero h1 { font-size: clamp(1.5rem, 5vw, 2.2rem) !important; }
+.detail-layout, .grid-two { gap: .75rem; }
+.stack { gap: .75rem; }
+@media (max-width: 540px) {
+  .header-inner, .fuel-row, .main { width: min(100% - .8rem, var(--max-width)); }
+  .brand { font-size: 1.32rem; }
+  .header-location-pill { max-width: 116px; min-height: 34px; padding-inline: .58rem; }
+  .icon-button { width: 34px; height: 34px; min-height: 34px; }
+}

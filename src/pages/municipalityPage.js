@@ -6,6 +6,13 @@ import { Breadcrumbs } from '../components/breadcrumbs.js';
 import { MapView } from '../components/mapView.js';
 import { StationList } from '../components/stationList.js';
 import { StatsGrid } from '../components/statsGrid.js';
+import { HistoricalChart } from '../components/historicalChart.js';
+
+function dateNDaysAgo(days) {
+  const date = new Date();
+  date.setDate(date.getDate() - days);
+  return date.toISOString().slice(0, 10);
+}
 
 export function MunicipalityPage(params) {
   const provincia = decodeURIComponent(params.provincia || '');
@@ -15,19 +22,20 @@ export function MunicipalityPage(params) {
   async function load() {
     try {
       const fuel = FuelStore.current();
-      const [stats, stationsResult, ranking, mapStations] = await Promise.all([
+      const [stats, stationsResult, ranking, mapStations, trend] = await Promise.all([
         Api.stats({ provincia, municipio }),
         Api.stations({ provincia, municipio, combustible: fuel.id, order: 'precio_asc', limit: 80 }),
         Api.ranking({ provincia, municipio, combustible: fuel.id, order: 'baratas', limit: 10 }),
-        Api.map({ provincia, municipio, limit: 300 })
+        Api.map({ provincia, municipio, limit: 300 }),
+        Api.trend({ provincia, municipio, periodo: 'dia', fecha_desde: dateNDaysAgo(30) }).catch(() => ({ data: [] }))
       ]);
-      render(stats, stationsResult.data || [], ranking, mapStations);
+      render(stats, stationsResult.data || [], ranking, mapStations, trend?.data || []);
     } catch (error) {
       clear(container).append(errorBox(error.message));
     }
   }
 
-  function render(stats, stations, ranking, mapStations) {
+  function render(stats, stations, ranking, mapStations, trendRows = []) {
     const fuel = FuelStore.current();
     clear(container).append(
       Breadcrumbs([
@@ -48,6 +56,12 @@ export function MunicipalityPage(params) {
           ])
         )
       ),
+      HistoricalChart(trendRows, {
+        title: `Histórico ${fuel.label} en ${municipio}`,
+        subtitle: `Media diaria de ${municipio}, ${provincia}`,
+        limit: 30,
+        ariaLabel: `Histórico de precios en ${municipio}`
+      }),
       h('section', { class: 'grid-two section' },
         h('div', { class: 'stack' },
           h('div', { class: 'section-head' },

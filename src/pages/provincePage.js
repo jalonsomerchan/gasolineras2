@@ -6,6 +6,13 @@ import { Breadcrumbs } from '../components/breadcrumbs.js';
 import { MapView } from '../components/mapView.js';
 import { StationList } from '../components/stationList.js';
 import { StatsGrid } from '../components/statsGrid.js';
+import { HistoricalChart } from '../components/historicalChart.js';
+
+function dateNDaysAgo(days) {
+  const date = new Date();
+  date.setDate(date.getDate() - days);
+  return date.toISOString().slice(0, 10);
+}
 
 export function ProvincePage(params) {
   const provincia = decodeURIComponent(params.provincia || '');
@@ -14,13 +21,14 @@ export function ProvincePage(params) {
   async function load() {
     try {
       const fuel = FuelStore.current();
-      const [stats, municipalities, ranking, mapStations] = await Promise.all([
+      const [stats, municipalities, ranking, mapStations, trend] = await Promise.all([
         Api.stats({ provincia }),
         Api.municipalities({ provincia }),
         Api.ranking({ provincia, combustible: fuel.id, order: 'baratas', limit: 12 }),
-        Api.map({ provincia, limit: 500 })
+        Api.map({ provincia, limit: 500 }),
+        Api.trend({ provincia, periodo: 'dia', fecha_desde: dateNDaysAgo(30) }).catch(() => ({ data: [] }))
       ]);
-      render(stats, municipalities, ranking, mapStations);
+      render(stats, municipalities, ranking, mapStations, trend?.data || []);
     } catch (error) {
       clear(container).append(errorBox(error.message));
     }
@@ -34,7 +42,7 @@ export function ProvincePage(params) {
     );
   }
 
-  function render(stats, municipalities, ranking, mapStations) {
+  function render(stats, municipalities, ranking, mapStations, trendRows = []) {
     const fuel = FuelStore.current();
     clear(container).append(
       Breadcrumbs([{ label: provincia }]),
@@ -52,6 +60,12 @@ export function ProvincePage(params) {
           ])
         )
       ),
+      HistoricalChart(trendRows, {
+        title: `Histórico ${fuel.label} en ${provincia}`,
+        subtitle: `Media diaria provincial`,
+        limit: 30,
+        ariaLabel: `Histórico de precios en ${provincia}`
+      }),
       h('section', { class: 'grid-two section' },
         h('div', { class: 'stack' },
           h('div', { class: 'section-head' },

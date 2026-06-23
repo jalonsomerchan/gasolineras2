@@ -2,11 +2,19 @@ import { Api } from '../services/api.js';
 import { FavoritesStore } from '../state/favoritesStore.js';
 import { FuelStore } from '../state/fuelStore.js';
 import { h, loading, errorBox, clear } from '../utils/dom.js';
-import { dateText, distance, price, routePart, stationName } from '../utils/format.js';
+import { dateText, price, routePart, stationName } from '../utils/format.js';
 import { Breadcrumbs } from '../components/breadcrumbs.js';
 import { MapView } from '../components/mapView.js';
 import { StationList } from '../components/stationList.js';
 import { StatsGrid } from '../components/statsGrid.js';
+import { HistoricalChart } from '../components/historicalChart.js';
+
+
+function dateNDaysAgo(days) {
+  const date = new Date();
+  date.setDate(date.getDate() - days);
+  return date.toISOString().slice(0, 10);
+}
 
 export function StationPage(params) {
   const container = h('div', {}, loading('Cargando gasolinera...'));
@@ -14,20 +22,23 @@ export function StationPage(params) {
   async function load() {
     try {
       const station = await Api.gasStation(params.ideess);
-      const ranking = await Api.ranking({
-        provincia: station.provincia,
-        municipio: station.municipio,
-        combustible: FuelStore.get(),
-        order: 'baratas',
-        limit: 8
-      }).catch(() => []);
-      render(station, ranking);
+      const [ranking, trend] = await Promise.all([
+        Api.ranking({
+          provincia: station.provincia,
+          municipio: station.municipio,
+          combustible: FuelStore.get(),
+          order: 'baratas',
+          limit: 8
+        }).catch(() => []),
+        Api.trend({ ideess: params.ideess, periodo: 'dia', fecha_desde: dateNDaysAgo(30) }).catch(() => ({ data: [] }))
+      ]);
+      render(station, ranking, trend?.data || []);
     } catch (error) {
       clear(container).append(errorBox(error.message));
     }
   }
 
-  function render(station, ranking) {
+  function render(station, ranking, trendRows = []) {
     const fuel = FuelStore.current();
     const isFavorite = FavoritesStore.has(station.ideess);
     clear(container).append(
@@ -46,7 +57,7 @@ export function StationPage(params) {
             type: 'button',
             onClick: () => {
               FavoritesStore.toggle(station.ideess);
-              render(station, ranking);
+              render(station, ranking, trendRows);
             }
           }, isFavorite ? '★ Quitar favorito' : '☆ Guardar favorito'),
           h('a', { class: 'btn ghost', href: `#/municipio/${routePart(station.provincia)}/${routePart(station.municipio)}` }, 'Ver municipio'),
@@ -79,6 +90,12 @@ export function StationPage(params) {
           )
         )
       ),
+      HistoricalChart(trendRows, {
+        title: `Histórico ${fuel.label} en esta gasolinera`,
+        subtitle: stationName(station),
+        limit: 30,
+        ariaLabel: `Histórico de precios de ${stationName(station)}`
+      }),
       h('section', { class: 'section' },
         h('div', { class: 'section-head' },
           h('div', {}, h('h2', { class: 'section-title' }, 'Más baratas en este municipio'), h('p', { class: 'section-subtitle' }, 'Comparativa rápida con el combustible seleccionado.'))

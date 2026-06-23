@@ -106,7 +106,7 @@ export function HomePage() {
     }
     try {
       const stations = await Api.stationsDetail(ids);
-      favoriteContainer.append(StationList(stations.slice(0, 6), { onFavoriteChange: loadFavorites }));
+      favoriteContainer.append(StationList(stations.slice(0, 6), { onFavoriteChange: loadFavorites, ranked: true, emptyMessage: 'No tienes favoritos guardados.' }));
     } catch (error) {
       favoriteContainer.append(errorBox(error.message));
     }

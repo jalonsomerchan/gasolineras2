@@ -1082,3 +1082,252 @@ button.filter-chip { cursor: pointer; }
   .bottom-nav { width: min(100% - .9rem, var(--max-width)); }
   .bottom-nav a small { display: none; }
 }
+
+/* v8: favorito como lista, buscador más discreto y charts con Chart.js */
+.fuel-toggle {
+  max-width: 640px;
+  margin-inline: auto;
+  padding: .24rem;
+  border-radius: 18px;
+}
+.fuel-option {
+  min-height: 38px;
+  padding: .34rem .52rem;
+  border-radius: 15px;
+  font-size: .78rem;
+}
+.search-panel,
+.search-panel.is-small {
+  grid-template-columns: minmax(0, 1fr) 38px;
+  gap: .4rem;
+}
+.search-form {
+  min-height: 40px;
+  padding: .2rem .22rem .2rem .62rem;
+  border-radius: 15px;
+  box-shadow: none;
+}
+.search-icon { font-size: .82rem; opacity: .75; }
+.search-form input {
+  font-size: .84rem;
+  letter-spacing: -.015em;
+}
+.search-form .btn {
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  min-height: 32px;
+  border-radius: 10px;
+}
+.search-form .btn::after { font-size: .96rem; }
+.filter-button {
+  width: 38px;
+  height: 40px;
+  border-radius: 14px;
+  font-size: .95rem;
+}
+.status-strip {
+  grid-template-columns: minmax(132px, .86fr) .56fr .68fr;
+  gap: .5rem;
+}
+.status-fuel,
+.status-meta {
+  min-height: 46px;
+  border-radius: 15px;
+  padding: .46rem .58rem;
+}
+.status-fuel strong { font-size: .8rem; }
+.status-meta span { font-size: .64rem; }
+.status-meta strong { font-size: .82rem; }
+.status-meta.is-price strong { font-size: .98rem; }
+.radar-card {
+  padding: .66rem .72rem;
+  border-radius: 16px;
+}
+.radar-header p { font-size: .66rem; letter-spacing: .055em; }
+.radar-header span { font-size: .66rem; }
+.radar-grid { margin: .54rem 0 .42rem; }
+.radar-metric { padding: .46rem .58rem; }
+.radar-metric span { font-size: .55rem; }
+.radar-metric strong { font-size: clamp(1.22rem, 4.8vw, 1.78rem); }
+.radar-foot { min-height: 28px; font-size: .68rem; }
+.filter-chip {
+  min-height: 34px;
+  padding: 0 .64rem;
+  font-size: .72rem;
+}
+.stations-panel,
+.favorites-panel {
+  padding: .58rem .72rem .1rem;
+}
+.favorites-panel .station-list,
+.stations-panel .station-list { gap: 0; }
+.favorites-panel .station-card,
+.stations-panel .station-card {
+  min-height: 58px;
+  grid-template-columns: 26px 38px minmax(0, 1fr) auto;
+  gap: .48rem;
+  padding: .46rem 0;
+}
+.station-card {
+  min-height: 58px;
+  grid-template-columns: auto 38px minmax(0, 1fr) auto;
+  gap: .48rem;
+  padding: .48rem 0;
+}
+.rank { width: 26px; height: 26px; font-size: .74rem; }
+.station-logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 13px;
+  font-size: .68rem;
+}
+.station-title,
+.station-title a {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: .82rem;
+  line-height: 1.05;
+}
+.station-meta {
+  margin-top: .08rem;
+  font-size: .72rem;
+  line-height: 1.18;
+}
+.station-actions { margin-top: .16rem; gap: .2rem; }
+.mini-meta { font-size: .61rem; }
+.price-value { font-size: .98rem; }
+.price-label { font-size: .6rem; }
+.favorite-btn {
+  width: 23px;
+  height: 23px;
+  font-size: .76rem;
+}
+.price-box { gap: .05rem; }
+.map-view.small { height: 124px; min-height: 124px; }
+.map-view { height: 340px; min-height: 340px; }
+.map-open-button {
+  min-height: 38px;
+  padding: 0 .62rem;
+  border-radius: 12px;
+  font-size: .76rem;
+}
+.price-marker {
+  min-width: 40px;
+  height: 25px;
+  border-radius: 10px 10px 10px 4px;
+  font-size: .7rem;
+}
+.bottom-nav {
+  width: min(100% - 1.1rem, var(--max-width));
+  padding: .34rem;
+  border-radius: 16px;
+}
+.bottom-nav a {
+  min-height: 38px;
+  border-radius: 12px;
+}
+.bottom-nav a span { font-size: .96rem; }
+.bottom-nav a small { font-size: .6rem; }
+
+.chart-card {
+  display: grid;
+  gap: .62rem;
+  padding: .72rem .78rem;
+  border: 1px solid var(--border);
+  border-radius: 17px;
+  background:
+    radial-gradient(circle at 8% -20%, rgba(69, 224, 199, .14), transparent 12rem),
+    color-mix(in srgb, var(--surface-strong) 82%, transparent);
+  box-shadow: none;
+}
+.chart-card.is-compact { padding: .66rem .72rem; }
+.chart-head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: .8rem;
+}
+.chart-head h2 {
+  margin: 0;
+  font-size: .8rem;
+  font-weight: 850;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--muted);
+}
+.chart-head p {
+  margin: .12rem 0 0;
+  color: var(--faint);
+  font-size: .68rem;
+}
+.chart-status {
+  color: var(--muted);
+  font-size: .72rem;
+  font-weight: 850;
+  white-space: nowrap;
+}
+.chart-body {
+  height: 210px;
+  min-height: 210px;
+}
+.chart-card.is-compact .chart-body {
+  height: 126px;
+  min-height: 126px;
+}
+.chart-body canvas { width: 100% !important; height: 100% !important; }
+.chart-summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: .42rem;
+  padding-top: .42rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: .7rem;
+}
+.chart-summary strong {
+  color: var(--brand-dark);
+  font-size: 1rem;
+  letter-spacing: -.055em;
+}
+.chart-card.is-compact .chart-summary strong { font-size: .92rem; }
+.chart-empty {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: .82rem;
+}
+.trend-card { display: none; }
+@media (min-width: 860px) {
+  .favorites-panel .station-card,
+  .stations-panel .station-card,
+  .station-card {
+    grid-template-columns: 28px 40px minmax(0, 1fr) auto;
+    min-height: 60px;
+  }
+  .favorites-panel .station-title,
+  .favorites-panel .station-title a { font-size: .84rem; }
+}
+@media (max-width: 700px) {
+  .status-strip { grid-template-columns: 1fr 1fr; gap: .45rem; }
+  .status-fuel { grid-column: 1 / -1; min-height: 44px; }
+  .status-meta { min-height: 40px; }
+  .favorites-panel .station-card,
+  .stations-panel .station-card,
+  .station-card { grid-template-columns: 24px minmax(0, 1fr) auto; }
+  .station-logo { display: none; }
+  .chart-body { height: 180px; min-height: 180px; }
+}
+@media (max-width: 470px) {
+  .status-strip { grid-template-columns: 1fr; }
+  .favorites-panel .station-card,
+  .stations-panel .station-card,
+  .station-card { grid-template-columns: minmax(0, 1fr) auto; }
+  .station-card .rank { display: none; }
+  .chart-summary { justify-content: space-between; }
+}

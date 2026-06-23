@@ -205,3 +205,11 @@ body::before {
   --shadow: 0 18px 48px rgba(0, 0, 0, .28);
 }
 body { font-size: 15px; }
+
+/* v8: más compacto y más cercano al radar de la referencia */
+:root {
+  --max-width: 760px;
+  --radius: 18px;
+  --radius-sm: 12px;
+}
+body { font-size: 14px; }

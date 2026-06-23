@@ -1,7 +1,7 @@
 import { DEFAULT_POSITION } from '../config/constants.js';
 
 const LAST_LOCATION_KEY = 'gasolina:last-location';
-const DEVICE_TIMEOUT = 26000;
+const DEVICE_TIMEOUT = 32000;
 
 function isLocalhost() {
   return ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
@@ -26,112 +26,24 @@ async function permissionState() {
   }
 }
 
-function positionOnce(options) {
-  return new Promise((resolve, reject) => {
-    if (!navigator.geolocation) {
-      reject(new Error('Geolocalización no disponible en este navegador'));
-      return;
-    }
-    if (!isSecureEnough()) {
-      reject(new Error('La geolocalización solo funciona en HTTPS o localhost'));
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => resolve(normalizeDevicePosition(position)),
-      (error) => reject(new Error(geoErrorMessage(error))),
-      options
-    );
-  });
-}
-
-function watchPositionBest(timeout = DEVICE_TIMEOUT) {
-  return new Promise((resolve, reject) => {
-    if (!navigator.geolocation || !isSecureEnough()) {
-      reject(new Error('Geolocalización no disponible'));
-      return;
-    }
-
-    let watchId = null;
-    let best = null;
-    let lastError = null;
-
-    const finish = (result, error = null) => {
-      if (watchId !== null) navigator.geolocation.clearWatch(watchId);
-      window.clearTimeout(timer);
-      if (result) resolve(result);
-      else reject(error || lastError || new Error('No se pudo obtener la ubicación del dispositivo'));
-    };
-
-    const timer = window.setTimeout(() => finish(best, lastError || new Error('El navegador tardó demasiado en dar la ubicación')), timeout);
-
-    watchId = navigator.geolocation.watchPosition(
-      (position) => {
-        const location = normalizeDevicePosition(position);
-        if (!best || Number(location.accuracy || Infinity) < Number(best.accuracy || Infinity)) {
-          best = location;
-        }
-        if (!location.accuracy || location.accuracy <= 250) finish(location);
-      },
-      (error) => {
-        lastError = new Error(geoErrorMessage(error));
-        if (error?.code === 1) finish(null, lastError);
-        // iOS/macOS puede lanzar POSITION_UNAVAILABLE al principio y dar posición segundos después.
-        // Por eso no se rechaza en code 2; se espera hasta timeout.
-      },
-      { enableHighAccuracy: true, timeout, maximumAge: 0 }
-    );
-  });
-}
-
-function normalizeDevicePosition(position) {
+function normalizeDevicePosition(position, label = 'tu ubicación actual') {
   return {
     latitud: position.coords.latitude,
     longitud: position.coords.longitude,
     latitude: position.coords.latitude,
     longitude: position.coords.longitude,
     accuracy: Math.round(position.coords.accuracy || 0),
-    label: 'tu ubicación actual',
+    label,
     source: 'device'
   };
 }
 
-async function devicePosition() {
-  if (await permissionState() === 'denied') {
-    throw new Error('El navegador tiene bloqueada la ubicación para esta web');
-  }
-
-  const tries = [
-    { enableHighAccuracy: false, timeout: 5000, maximumAge: Infinity },
-    { enableHighAccuracy: false, timeout: 13000, maximumAge: 5 * 60 * 1000 },
-    { enableHighAccuracy: true, timeout: 22000, maximumAge: 0 }
-  ];
-
-  let lastError = null;
-  for (const options of tries) {
-    try {
-      const location = await positionOnce(options);
-      saveLastLocation(location);
-      return location;
-    } catch (error) {
-      lastError = error;
-      await sleep(450);
-    }
-  }
-
-  try {
-    const location = await watchPositionBest();
-    saveLastLocation(location);
-    return location;
-  } catch (error) {
-    lastError = error;
-  }
-
-  throw lastError || new Error('No se pudo obtener la ubicación del dispositivo');
-}
-
-function sleep(ms) {
-  return new Promise((resolve) => window.setTimeout(resolve, ms));
+function geoErrorMessage(error) {
+  if (!error) return 'No se pudo obtener la ubicación';
+  if (error.code === 1) return 'El navegador no ha dado permiso de ubicación';
+  if (error.code === 2) return 'El sistema no puede calcular la ubicación ahora mismo';
+  if (error.code === 3) return 'El navegador tardó demasiado en dar la ubicación';
+  return error.message || 'No se pudo obtener la ubicación';
 }
 
 function saveLastLocation(location) {
@@ -140,7 +52,7 @@ function saveLastLocation(location) {
   } catch {}
 }
 
-function lastDeviceLocation(maxAge = 24 * 60 * 60 * 1000) {
+function lastDeviceLocation(maxAge = 7 * 24 * 60 * 60 * 1000) {
   try {
     const raw = window.localStorage.getItem(LAST_LOCATION_KEY);
     const saved = raw ? JSON.parse(raw) : null;
@@ -152,12 +64,85 @@ function lastDeviceLocation(maxAge = 24 * 60 * 60 * 1000) {
   }
 }
 
-function geoErrorMessage(error) {
-  if (!error) return 'No se pudo obtener la ubicación';
-  if (error.code === 1) return 'El navegador no ha dado permiso de ubicación';
-  if (error.code === 2) return 'La ubicación no está disponible ahora mismo';
-  if (error.code === 3) return 'El navegador tardó demasiado en dar la ubicación';
-  return error.message || 'No se pudo obtener la ubicación';
+function getCachedCurrentPosition() {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation || !isSecureEnough()) {
+      reject(new Error('Geolocalización no disponible'));
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => resolve(normalizeDevicePosition(position)),
+      (error) => reject(new Error(geoErrorMessage(error))),
+      { enableHighAccuracy: false, timeout: 4500, maximumAge: 15 * 60 * 1000 }
+    );
+  });
+}
+
+function watchDevicePosition(timeout = DEVICE_TIMEOUT) {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation || !isSecureEnough()) {
+      reject(new Error('Geolocalización no disponible'));
+      return;
+    }
+
+    let watchId = null;
+    let best = null;
+    let lastError = null;
+    let settled = false;
+
+    const finish = (result, error = null) => {
+      if (settled) return;
+      settled = true;
+      if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+      window.clearTimeout(timer);
+      if (result) resolve(result);
+      else reject(error || lastError || new Error('No se pudo obtener la ubicación del dispositivo'));
+    };
+
+    const timer = window.setTimeout(() => {
+      finish(best, lastError || new Error('No se pudo obtener una ubicación precisa del dispositivo'));
+    }, timeout);
+
+    watchId = navigator.geolocation.watchPosition(
+      (position) => {
+        const location = normalizeDevicePosition(position);
+        if (!best || Number(location.accuracy || Infinity) < Number(best.accuracy || Infinity)) {
+          best = location;
+        }
+
+        // En escritorio la precisión puede ser amplia; se acepta si el sistema devuelve coordenadas reales.
+        if (!location.accuracy || location.accuracy <= 3000) {
+          finish(location);
+        }
+      },
+      (error) => {
+        lastError = new Error(geoErrorMessage(error));
+        if (error?.code === 1) finish(null, lastError);
+        // POSITION_UNAVAILABLE en macOS/iOS suele llegar antes de que CoreLocation termine.
+        // Se espera hasta timeout en vez de caer a IP al primer error.
+      },
+      { enableHighAccuracy: false, timeout, maximumAge: 0 }
+    );
+  });
+}
+
+async function devicePosition({ preferFresh = true } = {}) {
+  if ((await permissionState()) === 'denied') {
+    throw new Error('El navegador tiene bloqueada la ubicación para esta web');
+  }
+
+  if (!preferFresh) {
+    try {
+      const cachedBrowserPosition = await getCachedCurrentPosition();
+      saveLastLocation(cachedBrowserPosition);
+      return cachedBrowserPosition;
+    } catch {}
+  }
+
+  const location = await watchDevicePosition(preferFresh ? DEVICE_TIMEOUT : 22000);
+  saveLastLocation(location);
+  return location;
 }
 
 async function ipPosition() {
@@ -227,7 +212,7 @@ export async function getBestLocation({ preferFresh = true } = {}) {
   const cached = lastDeviceLocation();
 
   try {
-    return emitLocation(await devicePosition());
+    return emitLocation(await devicePosition({ preferFresh }));
   } catch (deviceError) {
     if (!preferFresh && cached) return emitLocation(cached);
     try {
