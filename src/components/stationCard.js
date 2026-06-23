@@ -41,6 +41,15 @@ export function StationCard(station, options = {}, index = 0) {
       event.preventDefault();
       event.stopPropagation();
       FavoritesStore.toggle(station.ideess);
+      const active = FavoritesStore.has(station.ideess);
+      event.currentTarget.classList.toggle('is-active', active);
+      event.currentTarget.classList.remove('is-bouncing');
+      void event.currentTarget.offsetWidth;
+      event.currentTarget.classList.add('is-bouncing');
+      event.currentTarget.textContent = active ? '★' : '☆';
+      event.currentTarget.title = active ? 'Quitar de favoritos' : 'Añadir a favoritos';
+      event.currentTarget.setAttribute('aria-label', active ? 'Quitar de favoritos' : 'Añadir a favoritos');
+      window.setTimeout(() => event.currentTarget?.classList?.remove('is-bouncing'), 420);
       options.onFavoriteChange?.();
     }
   }, isFavorite ? '★' : '☆');
@@ -64,12 +73,10 @@ export function StationCard(station, options = {}, index = 0) {
         h('a', { class: 'price-link', href: `#/gasolinera/${station.ideess}` },
           priceInfo.hasDiscount ? h('div', { class: 'price-original' }, displayOriginal?.main || price(priceInfo.original)) : null,
           h('div', { class: 'price-value' }, displayCurrent.main),
-          h('div', { class: 'price-label' }, displayCurrent.isTank ? displayCurrent.unit : fuel.shortLabel),
           displayCurrent.secondary ? h('div', { class: 'price-secondary' }, displayCurrent.secondary) : null
         ),
         favoriteButton
       ),
-      priceInfo.hasDiscount ? h('div', { class: 'price-discount' }, DiscountStore.discountDescription(priceInfo)) : null,
       delta ? h('div', { class: `price-delta ${delta.className}` }, delta.label) : null
     )
   );

@@ -248,9 +248,6 @@ function googleMapsUrl(stations = [], center = null) {
 function popupHtml(station, priceInfo) {
   const display = displayFuelPrice(priceInfo?.effective);
   const originalDisplay = priceInfo?.hasDiscount ? displayFuelPrice(priceInfo.original) : null;
-  const discount = priceInfo?.hasDiscount
-    ? `<em>${escapeHtml(DiscountStore.discountDescription(priceInfo))}</em>`
-    : '';
   const original = priceInfo?.hasDiscount
     ? `<small>Antes: ${escapeHtml(originalDisplay.main || price(priceInfo.original))}</small>`
     : '';
@@ -261,7 +258,6 @@ function popupHtml(station, priceInfo) {
       <span>${escapeHtml(display.main)}</span>
       ${secondary}
       ${original}
-      ${discount}
       <small>${escapeHtml([station.direccion, station.municipio].filter(Boolean).join(' · '))}</small>
       <a href="#/gasolinera/${encodeURIComponent(station.ideess)}">Ver ficha</a>
     </div>

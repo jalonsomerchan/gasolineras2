@@ -2537,3 +2537,33 @@ button.filter-chip { cursor: pointer; }
   .station-summary-tiles { grid-template-columns: 1fr; }
   .station-data-list div { grid-template-columns: 1fr; gap: .1rem; }
 }
+
+
+/* v17 list cleanup */
+.station-card .price-label,
+.station-card .price-discount {
+  display: none !important;
+}
+.favorite-btn {
+  transition: transform .18s ease, color .18s ease, background-color .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.favorite-btn.is-bouncing {
+  animation: favorite-pop .38s cubic-bezier(.2, 1.35, .45, 1);
+}
+.favorite-btn.is-active.is-bouncing {
+  box-shadow: 0 0 0 7px rgba(255, 127, 50, .14);
+}
+@keyframes favorite-pop {
+  0% { transform: scale(.82) rotate(-8deg); }
+  55% { transform: scale(1.18) rotate(5deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+.price-line {
+  align-items: center;
+}
+.station-card.has-discount .price-original {
+  margin-bottom: .05rem;
+}
+.map-popup em {
+  display: none !important;
+}
