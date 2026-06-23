@@ -53,9 +53,7 @@ function readJson(filePath, fallback) {
 }
 
 async function fetchJson(endpoint, params = {}) {
-  if (!API_KEY) {
-    throw new Error('GASOLINA_API_KEY no definido');
-  }
+  if (!API_KEY) throw new Error('GASOLINA_API_KEY no definido');
 
   const url = new URL(`${API_BASE}/${endpoint.replace(/^\/+/, '')}`);
   Object.entries(params).forEach(([key, value]) => {
@@ -70,15 +68,10 @@ async function fetchJson(endpoint, params = {}) {
       Accept: 'application/json',
     },
   });
-
-  if (!response.ok) {
-    throw new Error(`${endpoint} respondió ${response.status}`);
-  }
+  if (!response.ok) throw new Error(`${endpoint} respondió ${response.status}`);
 
   const json = await response.json();
-  if (json?.error) {
-    throw new Error(json.msg || `Error en ${endpoint}`);
-  }
+  if (json?.error) throw new Error(json.msg || `Error en ${endpoint}`);
   return json;
 }
 
@@ -89,11 +82,10 @@ function htmlForPage(page) {
   const description = page.description || 'Consulta precios actualizados de gasolina, diésel y gasolina 98.';
   const h1 = page.h1 || title;
   const canonical = `${SITE_URL}${pagePath === '/' ? '/' : `${pagePath}/`.replace(/\/+/g, '/')}`;
-  const initialFuel = page.fuel || '';
-
+  const fuel = page.fuel || '';
+  const hashUrl = `/#${route}`;
   const scriptOpen = '<SCRIPT>';
   const scriptClose = '</' + 'SCRIPT>';
-  const moduleScriptOpen = '<SCRIPT type="module" src="./src/app.js">';
 
   return `<!doctype html>
 <html lang="es">
@@ -112,32 +104,23 @@ function htmlForPage(page) {
     <link rel="manifest" href="./manifest.webmanifest">
     <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="./assets/icon-192.png">
-    <link rel="preconnect" href="https://alon.one">
-    <link rel="preconnect" href="https://tile.openstreetmap.org">
     <link rel="stylesheet" href="./src/styles/base.css">
     <link rel="stylesheet" href="./src/styles/layout.css">
     <link rel="stylesheet" href="./src/styles/components.css">
   </head>
   <body>
-    <noscript>
-      <main style="max-width:900px;margin:40px auto;padding:24px;font-family:system-ui,sans-serif">
-        <h1>${escapeHtml(h1)}</h1>
-        <p>${escapeHtml(description)}</p>
-        <p>Activa JavaScript para consultar precios, mapas y favoritos.</p>
-      </main>
-    </noscript>
-    <main id="seo-content" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden">
+    <main style="max-width:900px;margin:40px auto;padding:24px;font-family:system-ui,sans-serif">
       <h1>${escapeHtml(h1)}</h1>
       <p>${escapeHtml(description)}</p>
-      <a href="/#${escapeHtml(route)}">Abrir ${escapeHtml(h1)}</a>
+      <p><a href="${escapeHtml(hashUrl)}">Abrir precios actualizados</a></p>
     </main>
-    <div id="app"></div>
     ${scriptOpen}
-      window.GASOLINA_INITIAL_ROUTE = ${JSON.stringify(route)};
-      window.GASOLINA_INITIAL_FUEL = ${JSON.stringify(initialFuel)};
+      try {
+        var fuel = ${JSON.stringify(fuel)};
+        if (fuel) localStorage.setItem('gasolineras2:fuel', fuel);
+        if (!location.hash) location.replace(${JSON.stringify(hashUrl)});
+      } catch (error) {}
     ${scriptClose}
-    <SCRIPT src="./config.js"></SCRIPT>
-    ${moduleScriptOpen}${scriptClose}
   </body>
 </html>
 `;
@@ -146,7 +129,6 @@ function htmlForPage(page) {
 function writePage(page) {
   const pagePath = ensureSlash(page.path);
   if (pagePath === '/') return;
-
   const targetDir = path.join(ROOT, ...pagePath.split('/').filter(Boolean));
   fs.mkdirSync(targetDir, { recursive: true });
   fs.writeFileSync(path.join(targetDir, 'index.html'), htmlForPage(page), 'utf8');
@@ -155,8 +137,7 @@ function writePage(page) {
 function uniquePages(pages) {
   const map = new Map();
   for (const page of pages) {
-    if (!page?.path) continue;
-    map.set(ensureSlash(page.path), { ...page, path: ensureSlash(page.path) });
+    if (page?.path) map.set(ensureSlash(page.path), { ...page, path: ensureSlash(page.path) });
   }
   return [...map.values()];
 }
@@ -177,7 +158,7 @@ async function apiPages() {
       fuel: fuel.id,
       title: `Precio de ${fuel.label} cerca de ti`,
       h1: `Precio de ${fuel.label} cerca de ti`,
-      description: `Consulta el precio de ${fuel.label} actualizado, encuentra gasolineras cercanas y compara tus favoritos.`,
+      description: `Consulta el precio de ${fuel.label} actualizado, gasolineras cercanas y favoritos.`,
     });
   }
 
