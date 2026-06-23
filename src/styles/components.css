@@ -1600,3 +1600,72 @@ button.filter-chip { cursor: pointer; }
   .price-delta { max-width: 112px; }
   .favorite-btn { width: 26px; height: 26px; }
 }
+
+/* v11: páginas separadas, mapas altos y búsqueda en mapa */
+.page-title-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: .25rem 0 .15rem;
+}
+.page-title-row h1 {
+  margin: .22rem 0 .15rem;
+  font-size: clamp(1.7rem, 4vw, 2.55rem);
+  letter-spacing: -.045em;
+}
+.page-title-row p { margin: 0; color: var(--muted); font-weight: 750; }
+.search-only-card {
+  padding: 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.search-page .search-wrap { max-width: 720px; }
+.search-page .search-form { min-height: 56px; }
+.helper-card { max-width: 720px; }
+.radar-page,
+.map-page,
+.favorites-page,
+.search-page { gap: 1.15rem; }
+.map-card.is-tall-map { border-radius: 26px; }
+.map-view,
+.map-view.tall { height: min(68vh, 640px); min-height: 520px; }
+.map-view.small { height: 260px; min-height: 260px; }
+.detail-layout .map-view.small { height: 310px; min-height: 310px; }
+.map-search-here {
+  position: absolute;
+  z-index: 405;
+  left: 50%;
+  top: .9rem;
+  transform: translateX(-50%);
+  min-height: 42px;
+  padding: 0 1rem;
+  border: 1px solid color-mix(in srgb, var(--brand) 44%, var(--border));
+  border-radius: 999px;
+  background: var(--brand);
+  color: #06231f;
+  font-weight: 950;
+  box-shadow: 0 16px 38px rgba(0,0,0,.2);
+}
+.map-search-here[hidden] { display: none; }
+.map-search-here:disabled { opacity: .8; cursor: progress; }
+.map-actions { top: .9rem; left: .9rem; }
+.map-page .map-actions,
+.radar-page .map-actions { top: .9rem; left: .9rem; }
+.map-page .stations-panel { margin-top: .1rem; }
+.bottom-nav a.is-active { color: var(--brand-dark); background: var(--brand-soft); }
+@media (max-width: 760px) {
+  .page-title-row { align-items: flex-start; flex-direction: column; gap: .45rem; }
+  .map-view,
+  .map-view.tall { height: 62vh; min-height: 430px; }
+  .map-view.small { height: 230px; min-height: 230px; }
+  .map-search-here { top: 3.6rem; min-height: 38px; font-size: .82rem; }
+}
+@media (max-width: 470px) {
+  .map-view,
+  .map-view.tall { height: 58vh; min-height: 390px; }
+  .map-view.small { height: 220px; min-height: 220px; }
+  .search-only-card { padding: .85rem; }
+}

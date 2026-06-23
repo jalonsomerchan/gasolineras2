@@ -1,5 +1,5 @@
 import { ensureLeaflet } from '../services/leafletLoader.js';
-import { getBestLocation } from '../services/location.js';
+import { devicePosition, getBestLocation } from '../services/location.js';
 import { h, loading } from '../utils/dom.js';
 import { numberValue, price, shortPrice, stationName } from '../utils/format.js';
 import { stationCoords } from '../utils/geo.js';
@@ -10,28 +10,32 @@ let mapId = 0;
 export function MapView(stations = [], options = {}) {
   const id = `map-${++mapId}`;
   const node = h('div', {
-    class: `map-view ${options.small ? 'small' : ''} is-loading`,
+    class: `map-view ${options.small ? 'small' : ''} ${options.tall ? 'tall' : ''} is-loading`,
     id,
     role: 'img',
     'aria-label': 'Mapa de gasolineras con precios'
   }, loading('Cargando mapa...'));
 
+  const searchHere = h('button', {
+    class: 'map-search-here',
+    type: 'button',
+    hidden: true
+  }, 'Buscar en esta localización');
+
   const controls = h('div', { class: 'map-actions', 'aria-label': 'Acciones del mapa' },
-    h('button', { class: 'map-action', type: 'button', dataset: { action: 'cheapest' }, title: 'Ir a la más barata' }, '€'),
-    h('button', { class: 'map-action', type: 'button', dataset: { action: 'me' }, title: 'Ir a mi ubicación' }, '⌖'),
-    h('button', { class: 'map-action', type: 'button', dataset: { action: 'fit' }, title: 'Centrar resultados' }, '□'),
-    h('a', { class: 'map-action', dataset: { action: 'google' }, href: googleMapsUrl(stations), target: '_blank', rel: 'noopener', title: 'Abrir en Google Maps' }, 'G')
+    h('button', { class: 'map-action', type: 'button', dataset: { action: 'cheapest' }, title: 'Ir a la más barata', 'aria-label': 'Ir a la más barata' }, '€'),
+    h('button', { class: 'map-action', type: 'button', dataset: { action: 'me' }, title: 'Ir a mi ubicación', 'aria-label': 'Ir a mi ubicación' }, '⌖'),
+    h('button', { class: 'map-action', type: 'button', dataset: { action: 'fit' }, title: 'Centrar resultados', 'aria-label': 'Centrar resultados' }, '□'),
+    h('a', { class: 'map-action', dataset: { action: 'google' }, href: googleMapsUrl(stations, options.center), target: '_blank', rel: 'noopener', title: 'Abrir en Google Maps', 'aria-label': 'Abrir en Google Maps' }, 'G')
   );
 
-  window.requestAnimationFrame(() => initMap(id, stations, options, controls));
+  window.requestAnimationFrame(() => initMap(id, stations, options, controls, searchHere));
   const children = [node, controls];
-  if (options.small) {
-    children.push(h('a', { class: 'map-open-button', href: '#/mapa', onClick: (event) => { event.preventDefault(); document.getElementById('nearby-map')?.scrollIntoView({ behavior: 'smooth' }); } }, h('span', { 'aria-hidden': 'true' }, '◇'), 'Ver mapa'));
-  }
-  return h('div', { class: `map-card ${options.small ? 'is-compact-map' : ''}` }, children);
+  if (options.searchHere) children.push(searchHere);
+  return h('div', { class: `map-card ${options.small ? 'is-compact-map' : ''} ${options.tall ? 'is-tall-map' : ''}` }, children);
 }
 
-async function initMap(id, stations, options, controls) {
+async function initMap(id, stations, options, controls, searchHere) {
   const element = document.getElementById(id);
   if (!element) return;
 
@@ -43,7 +47,7 @@ async function initMap(id, stations, options, controls) {
     element.classList.remove('is-loading');
 
     const map = L.map(element, {
-      scrollWheelZoom: false,
+      scrollWheelZoom: true,
       tap: true,
       zoomControl: !options.small,
       attributionControl: !options.small
@@ -60,7 +64,7 @@ async function initMap(id, stations, options, controls) {
     addStationMarkers(L, map, bounds, stations, markers);
     setInitialView(map, bounds, options.small);
     keepMapSized(map, element);
-    bindControls({ L, map, controls, bounds, stations, markers, getCenterMarker: () => centerMarker, setCenterMarker: (marker) => { centerMarker = marker; } });
+    bindControls({ L, map, controls, searchHere, bounds, stations, markers, getCenterMarker: () => centerMarker, setCenterMarker: (marker) => { centerMarker = marker; }, options });
   } catch (error) {
     element.classList.remove('is-loading');
     element.classList.add('map-error');
@@ -68,7 +72,40 @@ async function initMap(id, stations, options, controls) {
   }
 }
 
-function bindControls({ L, map, controls, bounds, stations, markers, getCenterMarker, setCenterMarker }) {
+function bindControls({ L, map, controls, searchHere, bounds, stations, markers, getCenterMarker, setCenterMarker, options }) {
+  const googleLink = controls.querySelector('[data-action="google"]');
+
+  function mapCenterLocation() {
+    const center = map.getCenter();
+    return {
+      latitud: center.lat,
+      longitud: center.lng,
+      label: 'Zona del mapa',
+      source: 'map'
+    };
+  }
+
+  if (options.searchHere && searchHere) {
+    map.on('movestart zoomstart', () => {
+      searchHere.hidden = false;
+    });
+    map.on('moveend zoomend', () => {
+      const center = mapCenterLocation();
+      if (googleLink) googleLink.href = googleMapsUrl([], center);
+    });
+    searchHere.addEventListener('click', async () => {
+      searchHere.disabled = true;
+      searchHere.textContent = 'Buscando...';
+      try {
+        await options.onSearchHere?.(mapCenterLocation());
+        searchHere.hidden = true;
+      } finally {
+        searchHere.disabled = false;
+        searchHere.textContent = 'Buscar en esta localización';
+      }
+    });
+  }
+
   controls.addEventListener('click', async (event) => {
     const button = event.target.closest('[data-action]');
     if (!button) return;
@@ -91,9 +128,15 @@ function bindControls({ L, map, controls, bounds, stations, markers, getCenterMa
 
     if (action === 'me') {
       button.classList.add('is-loading');
+      const original = button.textContent;
       button.textContent = '…';
       try {
-        const location = await getBestLocation({ preferFresh: true });
+        let location;
+        try {
+          location = await devicePosition();
+        } catch {
+          location = await getBestLocation({ preferFresh: true });
+        }
         const point = [Number(location.latitud), Number(location.longitud)];
         if (!Number.isFinite(point[0]) || !Number.isFinite(point[1])) return;
         const existing = getCenterMarker();
@@ -104,7 +147,7 @@ function bindControls({ L, map, controls, bounds, stations, markers, getCenterMa
         marker?.openPopup();
       } finally {
         button.classList.remove('is-loading');
-        button.textContent = '⌖';
+        button.textContent = original || '⌖';
       }
     }
   });
@@ -118,7 +161,7 @@ function addCenterMarker(L, map, bounds, center) {
   const point = [lat, lng];
   bounds.push(point);
   return L.circleMarker(point, {
-    radius: 7,
+    radius: 8,
     color: '#0f766e',
     fillColor: '#14b8a6',
     fillOpacity: 0.95,
@@ -160,15 +203,15 @@ function priceIcon(L, currentPrice, isCheapest) {
   return L.divIcon({
     className: 'leaflet-price-marker-wrap',
     html: `<span class="price-marker ${tone}">${escapeHtml(label)}</span>`,
-    iconSize: [58, 34],
-    iconAnchor: [29, 34],
-    popupAnchor: [0, -32]
+    iconSize: [62, 36],
+    iconAnchor: [31, 36],
+    popupAnchor: [0, -34]
   });
 }
 
 function setInitialView(map, bounds, small = false) {
   if (bounds.length > 1) {
-    map.fitBounds(bounds, { padding: small ? [16, 16] : [34, 34], maxZoom: small ? 13 : 15 });
+    map.fitBounds(bounds, { padding: small ? [18, 18] : [46, 46], maxZoom: small ? 13 : 15 });
   } else if (bounds.length === 1) {
     map.setView(bounds[0], small ? 13 : 14);
   } else {
@@ -189,9 +232,9 @@ function keepMapSized(map, element) {
   }
 }
 
-function googleMapsUrl(stations = []) {
+function googleMapsUrl(stations = [], center = null) {
   const cheapest = cheapestStation(stations);
-  const coords = cheapest ? stationCoords(cheapest) : stationCoords(stations[0]);
+  const coords = cheapest ? stationCoords(cheapest) : stationCoords(stations[0]) || stationCoords(center);
   if (!coords) return 'https://www.google.com/maps';
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${coords[0]},${coords[1]}`)}`;
 }

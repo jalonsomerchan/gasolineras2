@@ -1,36 +1,25 @@
 import { h } from '../utils/dom.js';
 
 const items = [
-  { href: '#/', icon: '◎', label: 'Radar' },
-  { href: '#/', icon: '⌕', label: 'Buscar' },
-  { href: '#/', icon: '♡', label: 'Favoritos' },
-  { href: '#/', icon: '◇', label: 'Mapa' },
-  { href: '#/', icon: '▥', label: 'Datos' }
+  { href: '#/radar', path: '/radar', icon: '◎', label: 'Radar' },
+  { href: '#/buscar', path: '/buscar', icon: '⌕', label: 'Buscar' },
+  { href: '#/favoritos', path: '/favoritos', icon: '♡', label: 'Favoritos' },
+  { href: '#/mapa', path: '/mapa', icon: '◇', label: 'Mapa' },
+  { href: '#/radar', path: '/datos', icon: '▥', label: 'Datos' }
 ];
 
+function currentPath() {
+  const raw = location.hash.replace(/^#/, '') || '/radar';
+  if (raw === '/') return '/radar';
+  return raw.split('?')[0].replace(/\/+$/, '') || '/radar';
+}
+
 export function BottomNav() {
+  const active = currentPath();
   return h('nav', { class: 'bottom-nav', 'aria-label': 'Navegación principal' },
-    items.map((item, index) => h('a', {
+    items.map((item) => h('a', {
       href: item.href,
-      class: index === 0 ? 'is-active' : '',
-      onClick: (event) => {
-        if (item.label === 'Buscar') {
-          event.preventDefault();
-          document.querySelector('.search-input')?.focus();
-        }
-        if (item.label === 'Favoritos') {
-          event.preventDefault();
-          document.getElementById('favorites')?.scrollIntoView({ behavior: 'smooth' });
-        }
-        if (item.label === 'Mapa') {
-          event.preventDefault();
-          document.getElementById('nearby-map')?.scrollIntoView({ behavior: 'smooth' });
-        }
-        if (item.label === 'Datos') {
-          event.preventDefault();
-          document.getElementById('price-radar')?.scrollIntoView({ behavior: 'smooth' });
-        }
-      }
+      class: active === item.path || (item.path === '/radar' && active === '/') ? 'is-active' : ''
     }, h('span', { 'aria-hidden': 'true' }, item.icon), h('small', {}, item.label)))
   );
 }

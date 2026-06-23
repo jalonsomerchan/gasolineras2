@@ -91,6 +91,33 @@ async function ipPosition() {
   return location;
 }
 
+
+export function devicePosition({ timeout = 12000 } = {}) {
+  return new Promise((resolve, reject) => {
+    if (!('geolocation' in navigator)) {
+      reject(new Error('Este navegador no soporta geolocalización.'));
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const location = {
+          latitud: position.coords.latitude,
+          longitud: position.coords.longitude,
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          label: 'Mi ubicación',
+          source: 'device',
+          accuracy: position.coords.accuracy
+        };
+        saveLastLocation(location);
+        resolve(location);
+      },
+      () => reject(new Error('No se pudo obtener la ubicación del dispositivo.')),
+      { enableHighAccuracy: true, timeout, maximumAge: 60000 }
+    );
+  });
+}
+
 export async function getBestLocation({ preferFresh = false } = {}) {
   const cached = !preferFresh ? lastLocation() : null;
   if (cached) return emitLocation(cached);
