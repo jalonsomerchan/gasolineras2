@@ -1,0 +1,19 @@
+{
+  "name": "Gasolineras cerca de ti",
+  "short_name": "Gasolina",
+  "description": "Precios de gasolina 95, diésel y gasolina 98 por ubicación, provincia, municipio y gasolinera.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#0f766e",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "assets/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

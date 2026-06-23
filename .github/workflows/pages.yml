@@ -1,0 +1,57 @@
+name: Deploy PWA to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Create runtime config
+        env:
+          GASOLINA_API_KEY: ${{ secrets.GASOLINA_API_KEY }}
+          GASOLINA_API_BASE: ${{ secrets.GASOLINA_API_BASE || 'https://alon.one/api/gasolina2' }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+
+          config = {
+              "apiBase": os.environ.get("GASOLINA_API_BASE") or "https://alon.one/api/gasolina2",
+              "apiKey": os.environ.get("GASOLINA_API_KEY") or ""
+          }
+
+          with open("config.js", "w", encoding="utf-8") as fh:
+              fh.write("window.GASOLINA_APP_CONFIG = ")
+              json.dump(config, fh, ensure_ascii=False)
+              fh.write(";\n")
+          PY
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
