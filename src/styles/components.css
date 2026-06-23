@@ -878,3 +878,207 @@
   .map-open-button { min-height: 50px; right: .75rem; padding-inline: .85rem; }
   .bottom-nav { width: min(100% - 1rem, var(--max-width)); }
 }
+
+/* Radar v7: componentes más minimalistas y compactos */
+.fuel-toggle {
+  gap: .22rem;
+  padding: .22rem;
+  border-radius: 16px;
+}
+.fuel-option {
+  min-height: 34px;
+  border-radius: 13px;
+  font-size: .76rem;
+  padding: .32rem .42rem;
+}
+.fuel-option span:first-child { font-size: .85rem; }
+
+.search-panel,
+.search-panel.is-small {
+  grid-template-columns: minmax(0, 1fr) 44px;
+  gap: .48rem;
+}
+.search-form {
+  min-height: 46px;
+  border-radius: 16px;
+  padding: .22rem .28rem .22rem .72rem;
+  gap: .1rem;
+}
+.search-form::before { font-size: 1.22rem; }
+.search-input {
+  min-height: 38px;
+  padding: 0 .45rem;
+  font-size: .9rem;
+}
+.search-form .btn {
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  min-height: 36px;
+  border-radius: 12px;
+}
+.search-form .btn::after { font-size: 1.04rem; }
+.filter-button {
+  width: 44px;
+  height: 46px;
+  border-radius: 16px;
+  font-size: 1.08rem;
+}
+.search-results {
+  inset: calc(100% + .34rem) 0 auto 0;
+  max-height: 270px;
+  padding: .38rem;
+  border-radius: 15px;
+}
+.search-result { padding: .55rem .62rem; border-radius: 12px; }
+.search-result strong { font-size: .9rem; }
+.search-result span { font-size: .75rem; }
+
+.status-strip {
+  grid-template-columns: minmax(154px, .92fr) .62fr .68fr;
+  gap: .62rem;
+}
+.status-fuel,
+.status-meta {
+  min-height: 54px;
+  border-radius: 17px;
+  padding: .56rem .72rem;
+  gap: .48rem;
+}
+.status-fuel span:first-child { font-size: 1.12rem; }
+.status-fuel strong { font-size: .88rem; }
+.status-meta { padding: .28rem .28rem .28rem .74rem; }
+.status-meta span { font-size: .72rem; }
+.status-meta strong { font-size: .9rem; }
+.status-meta.is-price strong { font-size: 1.08rem; }
+
+.radar-card {
+  padding: .78rem .86rem;
+  border-radius: 18px;
+  border-color: var(--border-strong);
+}
+.radar-header p { font-size: .72rem; }
+.radar-header span { font-size: .72rem; }
+.radar-grid { margin: .66rem 0 .5rem; }
+.radar-metric { padding: .55rem .75rem; }
+.radar-metric span { font-size: .62rem; }
+.radar-metric strong { margin-top: .28rem; font-size: clamp(1.45rem, 6vw, 2.12rem); }
+.radar-foot { min-height: 32px; font-size: .76rem; }
+.live-dot { width: 7px; height: 7px; box-shadow: 0 0 0 4px rgba(39, 200, 173, .10); }
+
+.filters-row { gap: .45rem; }
+.filter-chip {
+  min-height: 38px;
+  padding: 0 .78rem;
+  border-radius: 999px;
+  font-size: .78rem;
+  border: 1px solid var(--border-strong);
+}
+button.filter-chip { cursor: pointer; }
+
+.stations-panel,
+.favorites-panel { padding: .7rem .82rem .25rem; }
+.favorites-panel .station-list { gap: 0; }
+.station-card {
+  min-height: 66px;
+  grid-template-columns: auto 44px minmax(0, 1fr) auto;
+  gap: .58rem;
+  padding: .56rem 0;
+}
+.rank { width: 28px; height: 28px; font-size: .82rem; }
+.station-logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 15px;
+  font-size: .76rem;
+}
+.station-title { font-size: .88rem; line-height: 1.08; }
+.station-meta {
+  margin-top: .1rem;
+  font-size: .78rem;
+  line-height: 1.25;
+}
+.station-actions { margin-top: .22rem; gap: .25rem; }
+.mini-meta { font-size: .67rem; }
+.price-box { gap: .08rem; }
+.price-value { font-size: 1.08rem; letter-spacing: -.055em; }
+.price-label { font-size: .66rem; }
+.favorite-btn {
+  width: 25px;
+  height: 25px;
+  font-size: .82rem;
+}
+.sort-select { font-size: .74rem; padding: .18rem; }
+.sort-select span { padding-left: .34rem; }
+.sort-select button { padding: .3rem .42rem; }
+.location-inline { gap: .32rem; }
+.location-refresh { width: 24px; height: 24px; min-width: 24px; font-size: .8rem; }
+.loading, .empty, .error-box { padding: .72rem; border-radius: 15px; font-size: .84rem; }
+
+.map-card { border-radius: 18px; }
+.map-view.small { height: 142px; min-height: 142px; }
+.map-open-button {
+  right: .72rem;
+  min-height: 42px;
+  padding: 0 .72rem;
+  border-radius: 13px;
+  font-size: .82rem;
+}
+.price-marker {
+  min-width: 43px;
+  height: 27px;
+  border-radius: 11px 11px 11px 4px;
+  padding: 0 .38rem;
+  font-size: .74rem;
+}
+.price-marker::after {
+  bottom: -6px;
+  border-left-width: 5px;
+  border-right-width: 5px;
+  border-top-width: 7px;
+}
+
+.trend-card {
+  padding: .76rem .84rem;
+  border-radius: 18px;
+}
+.trend-header h2 { font-size: .73rem; }
+.trend-header span { font-size: .76rem; }
+.trend-body { gap: .8rem; }
+.trend-summary { min-width: 105px; }
+.trend-summary strong { font-size: 1.42rem; }
+.trend-summary span { font-size: .78rem; }
+
+.bottom-nav {
+  width: min(100% - 1.35rem, var(--max-width));
+  padding: .42rem;
+  border-radius: 18px;
+}
+.bottom-nav a { min-height: 42px; border-radius: 14px; }
+.bottom-nav a span { font-size: 1.05rem; }
+.bottom-nav a small { font-size: .64rem; }
+
+@media (max-width: 700px) {
+  .status-strip { grid-template-columns: 1fr 1fr; gap: .5rem; }
+  .status-fuel { grid-column: 1 / -1; min-height: 48px; }
+  .status-meta { min-height: 44px; }
+  .radar-metric { padding: .48rem .42rem; }
+  .radar-metric span { font-size: .56rem; }
+  .radar-metric strong { font-size: clamp(1.14rem, 5.5vw, 1.55rem); }
+  .station-card { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .station-logo { display: none; }
+  .station-card .rank { display: grid; }
+  .map-view.small { height: 132px; min-height: 132px; }
+}
+@media (max-width: 470px) {
+  .search-panel, .search-panel.is-small { grid-template-columns: minmax(0, 1fr) 42px; gap: .42rem; }
+  .search-form { min-height: 44px; border-radius: 15px; padding-left: .62rem; }
+  .filter-button { width: 42px; height: 44px; border-radius: 15px; }
+  .status-strip { grid-template-columns: 1fr; }
+  .status-meta { border-left: 0; border-top: 1px solid var(--border-strong); padding-left: 0; }
+  .station-card { grid-template-columns: minmax(0, 1fr) auto; }
+  .station-card .rank { display: none; }
+  .price-value { font-size: 1rem; }
+  .bottom-nav { width: min(100% - .9rem, var(--max-width)); }
+  .bottom-nav a small { display: none; }
+}

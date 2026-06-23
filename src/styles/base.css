@@ -193,3 +193,15 @@ body::before {
   background-size: 52px 52px;
 }
 :root[data-theme="light"] body::before { opacity: 0; }
+
+/* Radar v7: escala más compacta */
+:root {
+  --max-width: 690px;
+  --radius: 20px;
+  --radius-sm: 13px;
+  --shadow: 0 12px 34px rgba(14, 48, 43, .08);
+}
+:root[data-theme="dark"] {
+  --shadow: 0 18px 48px rgba(0, 0, 0, .28);
+}
+body { font-size: 15px; }

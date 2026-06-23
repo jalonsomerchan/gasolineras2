@@ -106,7 +106,7 @@ export function HomePage() {
     }
     try {
       const stations = await Api.stationsDetail(ids);
-      favoriteContainer.append(StationList(stations.slice(0, 8), { compact: true, onFavoriteChange: loadFavorites }));
+      favoriteContainer.append(StationList(stations.slice(0, 6), { onFavoriteChange: loadFavorites }));
     } catch (error) {
       favoriteContainer.append(errorBox(error.message));
     }
@@ -154,14 +154,14 @@ export function HomePage() {
   }
 
   const page = h('div', { class: 'dashboard home-radar' },
-    h('section', { id: 'favorites', class: 'favorites-strip glass-section' },
+    h('section', { id: 'favorites', class: 'glass-section stations-panel favorites-panel' },
       h('div', { class: 'section-head compact-head' },
         h('h2', { class: 'section-title' }, 'Favoritos'),
-        h('span', { class: 'section-subtitle' }, 'Guardados')
+        h('span', { class: 'section-subtitle' }, 'Tus estaciones')
       ),
       favoriteContainer
     ),
-    h('section', { class: 'search-panel' }, SearchBox(), h('button', { class: 'filter-button', type: 'button', title: 'Filtros' }, '☷')),
+    h('section', { class: 'search-panel is-small' }, SearchBox(), h('button', { class: 'filter-button', type: 'button', title: 'Filtros' }, '☷')),
     h('section', { class: 'status-strip' },
       h('div', { class: 'status-fuel' }, h('span', {}, '⛽'), h('strong', { 'data-home-fuel-label': 'true' }, FuelStore.current().label), h('span', {}, '⌄')),
       h('div', { class: 'status-meta' }, h('span', {}, 'Actualizado'), updateValue),
@@ -169,7 +169,7 @@ export function HomePage() {
     ),
     radarContainer,
     h('section', { class: 'filters-row', 'aria-label': 'Filtros rápidos' },
-      h('span', { class: 'filter-chip is-active' }, `⌖ ${NEARBY_RADIUS_KM} km`),
+      h('button', { class: 'filter-chip is-active', type: 'button', onClick: () => loadNearby(true), title: 'Usar mi ubicación actual' }, `⌖ ${NEARBY_RADIUS_KM} km`),
       h('span', { class: 'filter-chip' }, 'Provincia⌄'),
       h('span', { class: 'filter-chip' }, 'Municipio⌄'),
       h('span', { class: 'filter-chip' }, 'Más filtros ☷')

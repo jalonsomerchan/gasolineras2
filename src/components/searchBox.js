@@ -22,7 +22,7 @@ export function SearchBox() {
   const input = h('input', {
     class: 'search-input',
     type: 'search',
-    placeholder: 'Busca municipio, provincia o gasolinera...',
+    placeholder: 'Buscar gasolinera o zona',
     autocomplete: 'off',
     'aria-label': 'Buscar gasolineras, municipios o provincias'
   });
@@ -75,7 +75,7 @@ export function SearchBox() {
       if (!suggestions.length) await loadSuggestions();
       if (suggestions[0]) location.hash = suggestionHref(suggestions[0]);
     }
-  }, input, h('button', { class: 'btn', type: 'submit' }, 'Buscar'));
+  }, input, h('button', { class: 'btn', type: 'submit', 'aria-label': 'Buscar' }, 'Buscar'));
 
   return h('div', { class: 'search-wrap' }, form, results);
 }
