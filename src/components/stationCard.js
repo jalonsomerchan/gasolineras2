@@ -1,10 +1,21 @@
 import { FavoritesStore } from '../state/favoritesStore.js';
 import { FuelStore } from '../state/fuelStore.js';
 import { h } from '../utils/dom.js';
-import { dateText, distance, price, routePart, stationName } from '../utils/format.js';
+import { dateText, distance, numberValue, price, routePart, shortPrice, stationName } from '../utils/format.js';
 
 function initials(name) {
   return String(name || 'G').trim().slice(0, 2).toUpperCase();
+}
+
+function priceDelta(currentPrice, cheapestPrice) {
+  const current = numberValue(currentPrice);
+  const cheapest = numberValue(cheapestPrice);
+  if (current === null || cheapest === null || current <= 0 || cheapest <= 0) return null;
+  const delta = current - cheapest;
+  if (Math.abs(delta) < 0.0005) {
+    return { label: 'Opción más barata', className: 'is-cheapest' };
+  }
+  return { label: `+${shortPrice(delta)} €/L más cara`, className: 'is-more-expensive' };
 }
 
 export function StationCard(station, options = {}, index = 0) {
@@ -13,6 +24,7 @@ export function StationCard(station, options = {}, index = 0) {
   const currentPrice = station.precio ?? station[fuel.priceField];
   const title = stationName(station);
   const subtitle = [station.direccion, station.municipio].filter(Boolean).join(' · ');
+  const delta = priceDelta(currentPrice, options.cheapestPrice);
 
   const favoriteButton = h('button', {
     class: `favorite-btn ${isFavorite ? 'is-active' : ''}`,
@@ -44,7 +56,8 @@ export function StationCard(station, options = {}, index = 0) {
       favoriteButton,
       h('a', { class: 'price-link', href: `#/gasolinera/${station.ideess}` },
         h('div', { class: 'price-value' }, price(currentPrice)),
-        h('div', { class: 'price-label' }, fuel.shortLabel)
+        h('div', { class: 'price-label' }, fuel.shortLabel),
+        delta ? h('div', { class: `price-delta ${delta.className}` }, delta.label) : null
       )
     )
   );

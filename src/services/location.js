@@ -208,13 +208,24 @@ async function ipPosition() {
   throw lastError || new Error('No se pudo obtener ubicación por IP');
 }
 
-export async function getBestLocation({ preferFresh = true } = {}) {
+export async function getBestLocation({ preferFresh = false } = {}) {
   const cached = lastDeviceLocation();
 
+  // No se solicita CoreLocation automáticamente: en macOS/iOS puede imprimir
+  // kCLErrorLocationUnknown en consola aunque la app gestione bien el fallback.
+  // Solo se usa GPS cuando el usuario fuerza la ubicación desde el botón/chip.
+  if (!preferFresh) {
+    if (cached) return emitLocation(cached);
+    try {
+      return emitLocation(await ipPosition());
+    } catch {
+      return emitLocation(DEFAULT_POSITION);
+    }
+  }
+
   try {
-    return emitLocation(await devicePosition({ preferFresh }));
+    return emitLocation(await devicePosition({ preferFresh: true }));
   } catch (deviceError) {
-    if (!preferFresh && cached) return emitLocation(cached);
     try {
       return emitLocation(await ipPosition());
     } catch {

@@ -324,3 +324,14 @@
   .header-location-pill { max-width: 116px; min-height: 34px; padding-inline: .58rem; }
   .icon-button { width: 34px; height: 34px; min-height: 34px; }
 }
+
+/* v9 breathing room */
+.main { padding-top: .35rem; }
+.dashboard.home-radar { gap: .82rem; }
+.section, .glass-section { gap: .72rem; }
+.grid-two, .detail-layout { gap: 1rem; }
+.stack { gap: 1rem; }
+.section-head { gap: .8rem; }
+@media (max-width: 540px) {
+  .dashboard.home-radar { gap: .72rem; }
+}

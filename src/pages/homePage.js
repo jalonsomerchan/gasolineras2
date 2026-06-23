@@ -105,8 +105,9 @@ export function HomePage() {
       return;
     }
     try {
-      const stations = await Api.stationsDetail(ids);
-      favoriteContainer.append(StationList(stations.slice(0, 6), { onFavoriteChange: loadFavorites, ranked: true, emptyMessage: 'No tienes favoritos guardados.' }));
+      const fuel = FuelStore.current();
+      const stations = (await Api.stationsDetail(ids)).sort((a, b) => (numberValue(a[fuel.priceField]) ?? 999) - (numberValue(b[fuel.priceField]) ?? 999));
+      favoriteContainer.append(StationList(stations.slice(0, 6), { onFavoriteChange: loadFavorites, ranked: true, sortByPrice: true, emptyMessage: 'No tienes favoritos guardados.' }));
     } catch (error) {
       favoriteContainer.append(errorBox(error.message));
     }
@@ -162,11 +163,6 @@ export function HomePage() {
       favoriteContainer
     ),
     h('section', { class: 'search-panel is-small' }, SearchBox(), h('button', { class: 'filter-button', type: 'button', title: 'Filtros' }, '☷')),
-    h('section', { class: 'status-strip' },
-      h('div', { class: 'status-fuel' }, h('span', {}, '⛽'), h('strong', { 'data-home-fuel-label': 'true' }, FuelStore.current().label), h('span', {}, '⌄')),
-      h('div', { class: 'status-meta' }, h('span', {}, 'Actualizado'), updateValue),
-      h('div', { class: 'status-meta is-price' }, h('span', {}, 'Mejor precio'), bestPriceValue)
-    ),
     radarContainer,
     h('section', { class: 'filters-row', 'aria-label': 'Filtros rápidos' },
       h('button', { class: 'filter-chip is-active', type: 'button', onClick: () => loadNearby(true), title: 'Usar mi ubicación actual' }, `⌖ ${NEARBY_RADIUS_KM} km`),

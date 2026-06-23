@@ -1331,3 +1331,85 @@ button.filter-chip { cursor: pointer; }
   .station-card .rank { display: none; }
   .chart-summary { justify-content: space-between; }
 }
+
+/* v9 breathing room + price comparison */
+.price-link {
+  min-width: 118px;
+}
+.price-delta {
+  margin-top: .22rem;
+  font-size: .68rem;
+  line-height: 1.1;
+  font-weight: 850;
+  letter-spacing: -.02em;
+  white-space: nowrap;
+}
+.price-delta.is-cheapest { color: var(--brand-dark); }
+.price-delta.is-more-expensive { color: var(--danger); }
+.station-card {
+  min-height: 72px;
+  gap: .7rem;
+  padding: .72rem 0;
+}
+.favorites-panel .station-card,
+.stations-panel .station-card {
+  min-height: 72px;
+  gap: .7rem;
+  padding: .72rem 0;
+}
+.station-list { gap: 0; }
+.station-main { align-self: center; }
+.station-actions { margin-top: .28rem; gap: .32rem; }
+.station-meta { margin-top: .16rem; line-height: 1.25; }
+.price-box { gap: .12rem; min-width: 126px; }
+.glass-section,
+.stations-panel,
+.favorites-panel {
+  padding: .88rem 1rem .32rem;
+}
+.radar-card,
+.chart-card {
+  padding: .92rem 1rem;
+}
+.search-panel.is-small {
+  margin-block: .2rem;
+}
+.filters-row {
+  gap: .66rem;
+  margin-block: .12rem;
+}
+.map-view.small {
+  height: 144px;
+  min-height: 144px;
+}
+.compact-head { margin-bottom: .15rem; }
+@media (min-width: 860px) {
+  .favorites-panel .station-card,
+  .stations-panel .station-card,
+  .station-card {
+    grid-template-columns: 30px 44px minmax(0, 1fr) auto;
+    min-height: 74px;
+  }
+  .station-logo { width: 42px; height: 42px; }
+}
+@media (max-width: 700px) {
+  .favorites-panel .station-card,
+  .stations-panel .station-card,
+  .station-card {
+    grid-template-columns: 26px minmax(0, 1fr) auto;
+    min-height: 70px;
+  }
+  .price-link { min-width: 104px; }
+  .price-delta { font-size: .62rem; white-space: normal; text-align: right; }
+  .glass-section,
+  .stations-panel,
+  .favorites-panel { padding: .78rem .82rem .22rem; }
+}
+@media (max-width: 470px) {
+  .favorites-panel .station-card,
+  .stations-panel .station-card,
+  .station-card { grid-template-columns: minmax(0, 1fr) auto; }
+  .station-card .rank { display: none; }
+  .price-box { min-width: 100px; }
+}
+.status-strip { display: none !important; }
