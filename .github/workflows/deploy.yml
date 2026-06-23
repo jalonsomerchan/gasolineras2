@@ -1,0 +1,66 @@
+name: Deploy PWA to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Generate runtime config
+        env:
+          GASOLINA_API_KEY: ${{ secrets.GASOLINA_API_KEY }}
+          GASOLINA_API_BASE: ${{ vars.GASOLINA_API_BASE }}
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+
+          api_base = os.environ.get("GASOLINA_API_BASE") or "https://alon.one/api/gasolina2"
+          api_key = os.environ.get("GASOLINA_API_KEY") or ""
+
+          if not api_key:
+              print("::warning title=GASOLINA_API_KEY vacío::No se encontró el secret GASOLINA_API_KEY. La web se desplegará, pero la API responderá sin autorización hasta configurar el secret.")
+
+          config = {
+              "apiBase": api_base,
+              "apiKey": api_key,
+              "API_BASE_URL": api_base,
+              "API_KEY": api_key,
+          }
+
+          with open("config.js", "w", encoding="utf-8") as file:
+              file.write("window.GASOLINA_CONFIG = ")
+              json.dump(config, file, ensure_ascii=False)
+              file.write(";\n")
+          PY
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
