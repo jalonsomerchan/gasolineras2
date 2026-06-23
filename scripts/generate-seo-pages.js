@@ -2,8 +2,23 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = process.cwd();
-const API_BASE = (process.env.GASOLINA_API_BASE || 'https://alon.one/api/gasolina2').replace(/\/+$/, '');
-const API_KEY = process.env.GASOLINA_API_KEY || '';
+
+function readRuntimeConfig() {
+  const configPath = path.join(ROOT, 'config.js');
+  if (!fs.existsSync(configPath)) return {};
+  const raw = fs.readFileSync(configPath, 'utf8');
+  const match = raw.match(/window\.GASOLINA_CONFIG\s*=\s*(\{[\s\S]*?\})\s*;/);
+  if (!match) return {};
+  try {
+    return JSON.parse(match[1]);
+  } catch (error) {
+    return {};
+  }
+}
+
+const RUNTIME_CONFIG = readRuntimeConfig();
+const API_BASE = (process.env.GASOLINA_API_BASE || RUNTIME_CONFIG.apiBase || RUNTIME_CONFIG.API_BASE_URL || 'https://alon.one/api/gasolina2').replace(/\/+$/, '');
+const API_KEY = process.env.GASOLINA_API_KEY || RUNTIME_CONFIG.apiKey || RUNTIME_CONFIG.API_KEY || '';
 const SITE_URL = (process.env.SITE_URL || process.env.PAGES_URL || 'https://gasolineras2.alon.one').replace(/\/+$/, '');
 const MAX_MUNICIPIOS = Number(process.env.MAX_SEO_MUNICIPIOS || 250);
 const MAX_GASOLINERAS = Number(process.env.MAX_SEO_GASOLINERAS || 120);
