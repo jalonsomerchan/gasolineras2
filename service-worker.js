@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gasolineras2-v12';
+const CACHE_NAME = 'gasolineras2-v13';
 const APP_SHELL = [
   './',
   './index.html',

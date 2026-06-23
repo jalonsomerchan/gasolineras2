@@ -1669,3 +1669,270 @@ button.filter-chip { cursor: pointer; }
   .map-view.small { height: 220px; min-height: 220px; }
   .search-only-card { padding: .85rem; }
 }
+
+/* v13: improved gas station detail page */
+.station-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 1.2rem 1.35rem !important;
+  border: 1px solid var(--border);
+  border-radius: 26px !important;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(69, 224, 199, .18), transparent 18rem),
+    linear-gradient(145deg, color-mix(in srgb, var(--surface) 92%, transparent), var(--surface-soft));
+  box-shadow: var(--shadow);
+}
+.station-hero::after {
+  content: '';
+  position: absolute;
+  right: -7rem;
+  top: -7rem;
+  width: 16rem;
+  height: 16rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--brand) 16%, transparent);
+  pointer-events: none;
+}
+.station-hero > * { position: relative; z-index: 1; }
+.station-hero-top {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .45rem;
+}
+.station-hero h1 {
+  max-width: 980px;
+  font-size: clamp(2.05rem, 5.6vw, 4.25rem) !important;
+  letter-spacing: -.095em !important;
+}
+.station-hero p {
+  max-width: 860px;
+  font-size: 1rem;
+  font-weight: 750;
+}
+.station-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(320px, .72fr);
+  gap: 1.15rem;
+  align-items: start;
+}
+.station-current-card,
+.station-summary-card,
+.station-fuels-card {
+  padding: 1.18rem 1.25rem;
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at 8% 0%, color-mix(in srgb, var(--brand) 13%, transparent), transparent 14rem),
+    var(--surface);
+}
+.summary-kicker {
+  display: inline-flex;
+  color: var(--muted);
+  font-size: .76rem;
+  font-weight: 950;
+  letter-spacing: .045em;
+  text-transform: uppercase;
+}
+.station-current-price {
+  margin-top: .45rem;
+  color: var(--brand-dark);
+  font-size: clamp(2.65rem, 8vw, 5.4rem);
+  line-height: .94;
+  letter-spacing: -.105em;
+  font-weight: 950;
+}
+.current-price-diff {
+  margin: .55rem 0 0;
+  font-size: .98rem;
+  font-weight: 950;
+  letter-spacing: -.03em;
+}
+.current-price-diff.is-bad { color: var(--danger); }
+.current-price-diff.is-good { color: var(--brand-dark); }
+.current-price-diff.is-neutral { color: var(--muted); }
+.station-summary-card {
+  display: grid;
+  gap: 1rem;
+}
+.station-summary-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.station-summary-title strong {
+  color: var(--muted);
+  font-size: .86rem;
+}
+.summary-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .7rem;
+}
+.summary-metric {
+  min-height: 132px;
+  display: grid;
+  align-content: space-between;
+  gap: .4rem;
+  padding: .92rem;
+  border-radius: 21px;
+  border: 1px solid var(--border);
+  background: var(--surface-soft);
+}
+.summary-metric.is-primary {
+  color: #04211d;
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--brand), color-mix(in srgb, var(--brand) 72%, white));
+}
+.summary-metric span {
+  color: var(--muted);
+  font-size: .72rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: .035em;
+}
+.summary-metric.is-primary span,
+.summary-metric.is-primary small { color: rgba(4, 33, 29, .72); }
+.summary-metric strong {
+  color: var(--text);
+  font-size: clamp(1.28rem, 3vw, 1.85rem);
+  line-height: 1;
+  letter-spacing: -.075em;
+  word-break: keep-all;
+}
+.summary-metric.is-primary strong { color: #04211d; }
+.summary-metric small {
+  color: var(--muted);
+  font-size: .74rem;
+  font-weight: 850;
+}
+.summary-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .62rem;
+  padding-top: .25rem;
+}
+.summary-mini-grid div {
+  min-width: 0;
+  padding: .75rem;
+  border: 1px solid var(--border);
+  border-radius: 17px;
+  background: color-mix(in srgb, var(--surface-soft) 76%, transparent);
+}
+.summary-mini-grid span {
+  display: block;
+  color: var(--muted);
+  font-size: .68rem;
+  font-weight: 900;
+}
+.summary-mini-grid strong {
+  display: block;
+  margin-top: .18rem;
+  overflow: hidden;
+  color: var(--text);
+  font-size: .9rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.station-fuels-card {
+  display: grid;
+  gap: .95rem;
+  margin-top: .15rem;
+}
+.station-fuels-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.fuel-price-table {
+  display: grid;
+  gap: .55rem;
+}
+.fuel-price-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(190px, auto);
+  align-items: center;
+  gap: 1rem;
+  padding: .78rem .85rem;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--surface-soft) 78%, transparent);
+}
+.fuel-price-main {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: .72rem;
+}
+.fuel-price-icon {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 15px;
+  background: var(--brand-soft);
+  color: var(--brand-dark);
+  font-weight: 950;
+}
+.fuel-price-main strong {
+  display: block;
+  font-size: 1rem;
+  letter-spacing: -.035em;
+}
+.fuel-price-main small {
+  display: block;
+  margin-top: .08rem;
+  color: var(--muted);
+  font-size: .76rem;
+  font-weight: 750;
+}
+.fuel-price-current {
+  color: var(--brand-dark);
+  font-size: 1.45rem;
+  line-height: 1;
+  letter-spacing: -.07em;
+  font-weight: 950;
+  white-space: nowrap;
+}
+.fuel-price-range {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: .42rem;
+}
+.fuel-price-range span {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  padding: 0 .55rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  background: var(--surface);
+  font-size: .72rem;
+  font-weight: 850;
+  white-space: nowrap;
+}
+.station-data-card .station-meta {
+  white-space: normal;
+}
+@media (max-width: 980px) {
+  .station-detail-grid { grid-template-columns: 1fr; }
+  .fuel-price-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .fuel-price-range { grid-column: 1 / -1; justify-content: flex-start; }
+}
+@media (max-width: 680px) {
+  .station-hero { padding: 1rem !important; border-radius: 22px !important; }
+  .station-hero h1 { font-size: clamp(1.8rem, 13vw, 3.2rem) !important; }
+  .station-actions .btn { flex: 1 1 auto; min-height: 42px; }
+  .station-current-card,
+  .station-summary-card,
+  .station-fuels-card { padding: 1rem; border-radius: 22px; }
+  .summary-metrics { grid-template-columns: 1fr; }
+  .summary-metric { min-height: 104px; }
+  .summary-mini-grid { grid-template-columns: 1fr; }
+  .fuel-price-row { grid-template-columns: 1fr; gap: .65rem; }
+  .fuel-price-current { font-size: 1.25rem; }
+  .fuel-price-range { justify-content: flex-start; }
+}
