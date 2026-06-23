@@ -412,3 +412,135 @@
   .station-card { grid-template-columns: minmax(0, 1fr) auto; }
   .station-logo { display: none; }
 }
+
+/* Minimal components refresh */
+.card, .glass-section, .map-card, .map-preview-card { backdrop-filter: blur(18px); }
+.btn { min-height: 46px; padding: .62rem .9rem; box-shadow: none; }
+.btn.ghost { background: var(--surface); }
+.fuel-toggle { border-radius: 20px; padding: .25rem; box-shadow: none; background: var(--surface-strong); }
+.fuel-option { min-height: 44px; border-radius: 16px; font-size: .88rem; }
+.fuel-option.is-active { box-shadow: none; }
+.search-form { border-radius: 20px; padding: .32rem; box-shadow: none; background: var(--surface-strong); }
+.search-input { min-height: 52px; font-size: 1rem; }
+.search-results { border-radius: 18px; }
+.location-chip { min-height: 42px; padding: 0 .55rem 0 .78rem; box-shadow: none; }
+.location-refresh {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-soft);
+  color: var(--muted);
+  font-weight: 900;
+}
+.location-refresh:hover { color: var(--brand-dark); }
+.radar-card { padding: .9rem; border-radius: 21px; box-shadow: var(--shadow); background: var(--surface); }
+.radar-header p { font-size: .78rem; }
+.radar-grid { margin: .75rem 0; }
+.radar-metric { padding: .85rem .75rem; }
+.radar-metric strong { font-size: clamp(1.55rem, 5.8vw, 2.45rem); }
+.radar-foot { justify-content: flex-start; }
+.filters-row { gap: .45rem; }
+.filter-chip { min-height: 40px; padding: 0 .8rem; font-size: .86rem; box-shadow: none; }
+.station-card { grid-template-columns: auto auto minmax(0, 1fr) auto; gap: .65rem; padding: .72rem .1rem; }
+.station-logo { width: 48px; height: 48px; border-radius: 16px; font-size: .86rem; }
+.station-title { font-size: .98rem; }
+.station-meta { font-size: .84rem; }
+.station-actions { gap: .28rem; margin-top: .35rem; }
+.mini-meta, .pill { min-height: 24px; padding: .16rem .46rem; font-size: .72rem; }
+.price-value { font-size: 1.22rem; }
+.price-label { font-size: .72rem; }
+.favorite-btn { width: 30px; height: 30px; }
+.sort-select { background: transparent; }
+.sort-select button { padding: .38rem .55rem; }
+.compact-empty { padding: .62rem .75rem; border-radius: 16px; font-size: .88rem; }
+.station-list.is-compact-list {
+  display: flex;
+  gap: .55rem;
+  overflow-x: auto;
+  padding-bottom: .15rem;
+  scrollbar-width: none;
+}
+.station-list.is-compact-list::-webkit-scrollbar { display: none; }
+.station-card.is-compact {
+  min-width: 240px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: .6rem;
+  padding: .7rem;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface-soft);
+}
+.station-card.is-compact .station-logo { display: none; }
+.station-card.is-compact .station-actions .mini-meta:nth-child(n+3) { display: none; }
+.station-card.is-compact .favorite-btn { display: none; }
+.map-card, .map-preview-card { border-radius: 21px; box-shadow: var(--shadow); }
+.map-card.is-compact-map { margin-top: -.1rem; }
+.map-view { height: 390px; min-height: 390px; }
+.map-view.small { height: 190px; min-height: 190px; }
+:root[data-theme="dark"] .map-view .leaflet-tile { filter: brightness(.72) saturate(.88) contrast(1.08); }
+.leaflet-price-marker-wrap { background: transparent; border: 0; }
+.price-marker {
+  position: relative;
+  min-width: 48px;
+  height: 30px;
+  display: inline-grid;
+  place-items: center;
+  padding: 0 .48rem;
+  border: 1px solid rgba(255,255,255,.72);
+  border-radius: 12px 12px 12px 4px;
+  background: color-mix(in srgb, var(--surface-strong) 92%, transparent);
+  color: var(--text);
+  box-shadow: 0 8px 24px rgba(0,0,0,.18);
+  font-size: .82rem;
+  font-weight: 950;
+  letter-spacing: -.045em;
+}
+.price-marker::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -7px;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 8px solid color-mix(in srgb, var(--surface-strong) 92%, transparent);
+}
+.price-marker.is-cheap { background: linear-gradient(135deg, var(--brand), var(--brand-2)); color: #04211d; }
+.price-marker.is-cheap::after { border-top-color: var(--brand-2); }
+.map-popup { gap: .18rem; min-width: 180px; }
+.map-popup strong { font-size: .96rem; }
+.map-popup span { color: #087064; font-weight: 950; font-size: 1.12rem; }
+.map-popup small { color: #64706d; }
+.map-popup a { color: #087064; font-weight: 900; margin-top: .2rem; }
+.bottom-nav { border-radius: 22px; box-shadow: 0 12px 42px rgba(0,0,0,.16); }
+.bottom-nav a { min-height: 50px; }
+.bottom-nav a span { font-size: 1.18rem; }
+@media (max-width: 700px) {
+  .radar-card { padding: .85rem; }
+  .radar-grid { grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--border); }
+  .radar-metric { border-right: 1px solid var(--border); border-bottom: 0; padding: .7rem .45rem; }
+  .radar-metric:last-child { border-right: 0; }
+  .radar-metric span { font-size: .66rem; }
+  .radar-metric strong { font-size: clamp(1.25rem, 6vw, 1.8rem); }
+  .station-card { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .station-card .rank { display: grid; width: 30px; height: 30px; }
+  .station-logo { display: none; }
+  .station-card.is-compact { min-width: 218px; }
+  .search-form { grid-template-columns: 1fr auto; }
+  .search-form .btn { width: auto; min-width: 48px; padding-inline: .8rem; }
+  .search-form .btn span:last-child { display: none; }
+  .map-view.small { height: 168px; min-height: 168px; }
+}
+@media (max-width: 430px) {
+  .fuel-toggle { grid-template-columns: repeat(3, 1fr); }
+  .fuel-option { min-height: 42px; }
+  .station-card { grid-template-columns: minmax(0, 1fr) auto; }
+  .station-card .rank { display: none; }
+  .radar-metric { padding-inline: .25rem; }
+  .price-marker { min-width: 44px; height: 28px; font-size: .76rem; }
+}

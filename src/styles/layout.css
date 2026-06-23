@@ -136,3 +136,25 @@
   .brand-mark { display: none; }
   .section-head { align-items: start; flex-direction: column; }
 }
+
+/* Minimal layout refresh */
+.app-header { border-bottom: 0; background: color-mix(in srgb, var(--bg) 76%, transparent); }
+.header-inner { padding: .8rem 0 .55rem; }
+.brand { font-size: clamp(1.35rem, 4.5vw, 1.8rem); }
+.brand-mark { width: 34px; height: 34px; border-radius: 13px; box-shadow: none; }
+.fuel-row { padding-bottom: .6rem; }
+.main { padding-top: .75rem; }
+.dashboard { gap: .78rem; }
+.top-panel { gap: .72rem; }
+.headline-row { align-items: center; }
+.headline-row h1 { font-size: clamp(2rem, 7vw, 2.8rem); letter-spacing: -.075em; }
+.headline-row p { font-size: .95rem; }
+.glass-section { padding: .78rem; border-radius: 21px; box-shadow: var(--shadow); }
+.section-title { font-size: 1rem; }
+.section-subtitle { font-size: .82rem; }
+.compact-head { align-items: center; }
+.compact-head .section-subtitle { margin: 0; }
+.favorites-strip { gap: .55rem; padding: .7rem; }
+@media (max-width: 760px) {
+  .headline-row { gap: .6rem; }
+}

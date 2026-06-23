@@ -52,3 +52,12 @@ El workflow genera `config.js` durante el despliegue. Si el secret no está disp
 - Mapa de gasolineras cercanas con Leaflet y fallback de CDN.
 - Orden por precio o cercanía.
 - Páginas propias para gasolinera, municipio y provincia.
+
+## Cambios de la versión v5
+
+- Favoritos en la portada por encima del buscador.
+- Interfaz más minimalista, con menos sombras y tarjetas más limpias.
+- Mapa con marcadores de precio visibles sobre cada gasolinera.
+- Geolocalización reforzada: primero GPS fresco, después última ubicación guardada, después IP y por último Madrid.
+- Botón circular junto a la ubicación para forzar de nuevo la detección.
+- Caché PWA actualizada a `gasolineras2-v5`.

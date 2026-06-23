@@ -13,14 +13,18 @@ import { SortToggle } from '../components/sortToggle.js';
 import { StationList } from '../components/stationList.js';
 
 export function HomePage() {
-  const radarContainer = h('div', {}, loading('Calculando radar de precios...'));
+  const radarContainer = h('div', {}, loading('Calculando precios...'));
   const favoriteContainer = h('div', {}, loading('Cargando favoritos...'));
   const nearbyContainer = h('div', {}, loading('Buscando gasolineras cercanas...'));
+  const mapContainer = h('div');
   const sortContainer = h('div');
   const locationText = h('span', { class: 'muted' }, 'Detectando ubicación...');
+  const retryLocationButton = h('button', { class: 'location-refresh', type: 'button', title: 'Actualizar ubicación' }, '↻');
   let nearbyStations = [];
   let currentLocation = null;
   let sortBy = 'price';
+
+  retryLocationButton.addEventListener('click', () => loadNearby(true));
 
   function sortedStations() {
     const fuel = FuelStore.current();
@@ -30,13 +34,20 @@ export function HomePage() {
     });
   }
 
+  function locationLabel() {
+    if (!currentLocation) return '';
+    const suffix = currentLocation.source === 'device' ? 'GPS' : currentLocation.source === 'device-cache' ? 'GPS guardado' : currentLocation.source === 'ip' ? 'IP' : 'aprox.';
+    return `${currentLocation.label || 'Cerca de ti'} · ${suffix}`;
+  }
+
   function renderRadar() {
     clear(radarContainer);
-    radarContainer.append(PriceRadar(nearbyStations, currentLocation?.label || ''));
+    radarContainer.append(PriceRadar(nearbyStations, locationLabel()));
   }
 
   function renderNearby() {
     clear(nearbyContainer);
+    clear(mapContainer);
     clear(sortContainer);
     renderRadar();
     if (!nearbyStations.length) {
@@ -48,35 +59,34 @@ export function HomePage() {
       renderNearby();
     }));
     const sorted = sortedStations();
-    nearbyContainer.append(
-      h('div', { id: 'nearby-map', class: 'map-preview-card' }, MapView(sorted, { center: currentLocation, small: true })),
-      StationList(sorted.slice(0, 12), { emptyMessage: 'No hay gasolineras cercanas.', ranked: true })
-    );
+    nearbyContainer.append(StationList(sorted.slice(0, 10), { emptyMessage: 'No hay gasolineras cercanas.', ranked: true }));
+    mapContainer.append(MapView(sorted, { center: currentLocation, small: true }));
   }
 
   async function loadFavorites() {
     const ids = FavoritesStore.all();
     clear(favoriteContainer);
     if (!ids.length) {
-      favoriteContainer.append(EmptyState('Aún no tienes favoritos. Marca una gasolinera con la estrella para verla aquí.'));
+      favoriteContainer.append(h('div', { class: 'empty compact-empty' }, 'Sin favoritos todavía. Marca una gasolinera con ★ y aparecerá aquí.'));
       return;
     }
     try {
       const stations = await Api.stationsDetail(ids);
-      favoriteContainer.append(StationList(stations, { onFavoriteChange: loadFavorites }));
+      favoriteContainer.append(StationList(stations.slice(0, 8), { compact: true, onFavoriteChange: loadFavorites }));
     } catch (error) {
       favoriteContainer.append(errorBox(error.message));
     }
   }
 
-  async function loadNearby() {
+  async function loadNearby(forceFresh = false) {
     clear(nearbyContainer);
+    clear(mapContainer);
     clear(radarContainer);
     radarContainer.append(loading('Obteniendo precios cercanos...'));
     nearbyContainer.append(loading('Obteniendo ubicación...'));
     try {
-      currentLocation = await getBestLocation();
-      locationText.textContent = currentLocation.label || 'Cerca de ti';
+      currentLocation = await getBestLocation({ preferFresh: forceFresh });
+      locationText.textContent = locationLabel();
       clear(nearbyContainer);
       nearbyContainer.append(loading(`Buscando cerca de ${currentLocation.label}...`));
       nearbyStations = await Api.nearby({
@@ -102,34 +112,36 @@ export function HomePage() {
   const page = h('div', { class: 'dashboard' },
     h('section', { class: 'top-panel' },
       h('div', { class: 'headline-row' },
-        h('div', {}, h('h1', {}, 'Gasolina al día'), h('p', {}, 'Precios cercanos y favoritos en una vista rápida.')),
-        h('div', { class: 'location-chip' }, h('span', { 'aria-hidden': 'true' }, '⌖'), locationText)
+        h('div', {}, h('h1', {}, 'Gasolina al día'), h('p', {}, 'Encuentra el mejor precio cerca de ti.')),
+        h('div', { class: 'location-chip' }, h('span', { 'aria-hidden': 'true' }, '⌖'), locationText, retryLocationButton)
+      ),
+      h('section', { id: 'favorites', class: 'favorites-strip glass-section' },
+        h('div', { class: 'section-head compact-head' },
+          h('h2', { class: 'section-title' }, 'Favoritos'),
+          h('span', { class: 'section-subtitle' }, 'Local')
+        ),
+        favoriteContainer
       ),
       SearchBox()
     ),
     radarContainer,
     h('section', { class: 'filters-row', 'aria-label': 'Filtros rápidos' },
-      h('span', { class: 'filter-chip is-active' }, '📍 35 km'),
+      h('span', { class: 'filter-chip is-active' }, `📍 ${NEARBY_RADIUS_KM} km`),
       h('span', { class: 'filter-chip' }, 'Provincia'),
       h('span', { class: 'filter-chip' }, 'Municipio'),
       h('span', { class: 'filter-chip' }, 'Más filtros')
     ),
-    h('section', { id: 'favorites', class: 'glass-section' },
-      h('div', { class: 'section-head' },
-        h('div', {}, h('h2', { class: 'section-title' }, 'Mis favoritos'), h('p', { class: 'section-subtitle' }, 'Guardados solo en este dispositivo.'))
-      ),
-      favoriteContainer
-    ),
     h('section', { class: 'glass-section' },
       h('div', { class: 'section-head' },
-        h('div', {}, h('h2', { class: 'section-title' }, 'Estaciones cercanas'), h('p', { class: 'section-subtitle' }, 'Ubicación del dispositivo o fallback por IP.')),
+        h('div', {}, h('h2', { class: 'section-title' }, 'Estaciones cercanas'), h('p', { class: 'section-subtitle' }, 'Ordenadas por precio o distancia.')),
         sortContainer
       ),
       nearbyContainer
-    )
+    ),
+    mapContainer
   );
 
   loadFavorites();
-  loadNearby();
+  loadNearby(false);
   return page;
 }

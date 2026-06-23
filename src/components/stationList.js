@@ -4,5 +4,5 @@ import { StationCard } from './stationCard.js';
 
 export function StationList(stations, options = {}) {
   if (!stations?.length) return EmptyState(options.emptyMessage || 'No hay gasolineras para mostrar.');
-  return h('div', { class: 'station-list' }, stations.map((station, index) => StationCard(station, options, index)));
+  return h('div', { class: `station-list ${options.compact ? 'is-compact-list' : ''}` }, stations.map((station, index) => StationCard(station, options, index)));
 }

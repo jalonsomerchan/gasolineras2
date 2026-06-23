@@ -27,7 +27,7 @@ export function StationCard(station, options = {}, index = 0) {
     }
   }, isFavorite ? '★' : '☆');
 
-  return h('article', { class: 'station-card' },
+  return h('article', { class: `station-card ${options.compact ? 'is-compact' : ''}` },
     options.ranked ? h('div', { class: `rank ${index < 3 ? 'is-top' : ''}` }, String(index + 1)) : null,
     h('a', { class: 'station-logo', href: `#/gasolinera/${station.ideess}`, 'aria-hidden': 'true' }, initials(title)),
     h('div', { class: 'station-main' },
@@ -37,7 +37,7 @@ export function StationCard(station, options = {}, index = 0) {
         station.distancia_km !== undefined ? h('span', { class: 'mini-meta' }, distance(station.distancia_km)) : null,
         station.fecha ? h('span', { class: 'mini-meta' }, dateText(station.fecha)) : null,
         station.municipio ? h('a', { class: 'mini-meta', href: `#/municipio/${routePart(station.provincia)}/${routePart(station.municipio)}` }, station.municipio) : null,
-        station.provincia ? h('a', { class: 'mini-meta', href: `#/provincia/${routePart(station.provincia)}` }, station.provincia) : null
+        station.provincia && !options.compact ? h('a', { class: 'mini-meta', href: `#/provincia/${routePart(station.provincia)}` }, station.provincia) : null
       )
     ),
     h('div', { class: 'price-box' },

@@ -1,6 +1,6 @@
 import { ensureLeaflet } from '../services/leafletLoader.js';
 import { h } from '../utils/dom.js';
-import { numberValue, price, stationName } from '../utils/format.js';
+import { numberValue, price, shortPrice, stationName } from '../utils/format.js';
 import { stationCoords } from '../utils/geo.js';
 import { FuelStore } from '../state/fuelStore.js';
 
@@ -12,11 +12,11 @@ export function MapView(stations = [], options = {}) {
     class: `map-view ${options.small ? 'small' : ''} is-loading`,
     id,
     role: 'img',
-    'aria-label': 'Mapa de gasolineras'
+    'aria-label': 'Mapa de gasolineras con precios'
   }, 'Cargando mapa...');
 
   window.requestAnimationFrame(() => initMap(id, stations, options));
-  return h('div', { class: 'card map-card' }, node);
+  return h('div', { class: `map-card ${options.small ? 'is-compact-map' : ''}` }, node);
 }
 
 async function initMap(id, stations, options) {
@@ -33,7 +33,8 @@ async function initMap(id, stations, options) {
     const map = L.map(element, {
       scrollWheelZoom: false,
       tap: true,
-      zoomControl: true
+      zoomControl: !options.small,
+      attributionControl: !options.small
     });
 
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -44,7 +45,7 @@ async function initMap(id, stations, options) {
     const bounds = [];
     addCenterMarker(L, map, bounds, options.center);
     addStationMarkers(L, map, bounds, stations);
-    setInitialView(map, bounds);
+    setInitialView(map, bounds, options.small);
     keepMapSized(map, element);
   } catch (error) {
     element.classList.remove('is-loading');
@@ -61,11 +62,11 @@ function addCenterMarker(L, map, bounds, center) {
   const point = [lat, lng];
   bounds.push(point);
   L.circleMarker(point, {
-    radius: 8,
+    radius: 7,
     color: '#0f766e',
     fillColor: '#14b8a6',
-    fillOpacity: 0.85,
-    weight: 2
+    fillOpacity: 0.95,
+    weight: 3
   }).addTo(map).bindPopup(escapeHtml(center.label || 'Tu ubicación'));
 }
 
@@ -74,20 +75,33 @@ function addStationMarkers(L, map, bounds, stations) {
   stations
     .map((station) => [station, stationCoords(station)])
     .filter(([, coords]) => coords)
-    .forEach(([station, coords]) => {
+    .forEach(([station, coords], index) => {
       bounds.push(coords);
       const currentPrice = station.precio ?? station[fuel.priceField];
-      L.marker(coords)
+      const marker = L.marker(coords, { icon: priceIcon(L, currentPrice, index) })
         .addTo(map)
         .bindPopup(popupHtml(station, currentPrice));
+      marker.on('click', () => marker.openPopup());
     });
 }
 
-function setInitialView(map, bounds) {
+function priceIcon(L, currentPrice, index) {
+  const label = shortPrice(currentPrice);
+  const tone = index < 3 ? 'is-cheap' : '';
+  return L.divIcon({
+    className: 'leaflet-price-marker-wrap',
+    html: `<span class="price-marker ${tone}">${escapeHtml(label)}</span>`,
+    iconSize: [58, 34],
+    iconAnchor: [29, 34],
+    popupAnchor: [0, -32]
+  });
+}
+
+function setInitialView(map, bounds, small = false) {
   if (bounds.length > 1) {
-    map.fitBounds(bounds, { padding: [28, 28], maxZoom: 15 });
+    map.fitBounds(bounds, { padding: small ? [16, 16] : [32, 32], maxZoom: small ? 13 : 15 });
   } else if (bounds.length === 1) {
-    map.setView(bounds[0], 14);
+    map.setView(bounds[0], small ? 13 : 14);
   } else {
     map.setView([40.4168, -3.7038], 6);
   }
@@ -95,8 +109,9 @@ function setInitialView(map, bounds) {
 
 function keepMapSized(map, element) {
   const invalidate = () => map.invalidateSize({ pan: false });
-  window.setTimeout(invalidate, 80);
-  window.setTimeout(invalidate, 300);
+  window.setTimeout(invalidate, 60);
+  window.setTimeout(invalidate, 180);
+  window.setTimeout(invalidate, 500);
 
   if ('ResizeObserver' in window) {
     const observer = new ResizeObserver(invalidate);
@@ -110,6 +125,7 @@ function popupHtml(station, currentPrice) {
     <div class="map-popup">
       <strong>${escapeHtml(stationName(station))}</strong>
       <span>${escapeHtml(price(currentPrice))}</span>
+      <small>${escapeHtml([station.direccion, station.municipio].filter(Boolean).join(' · '))}</small>
       <a href="#/gasolinera/${encodeURIComponent(station.ideess)}">Ver ficha</a>
     </div>
   `;
