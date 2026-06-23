@@ -16,14 +16,20 @@ function permissionLabel(state) {
   return 'Sin comprobar';
 }
 
-function brandChip(brand, mode, onChange) {
-  const select = h('select', { class: 'brand-mode-select', 'aria-label': `Ajuste para ${brand}` },
-    h('option', { value: 'normal', selected: mode === 'normal' }, 'Normal'),
-    h('option', { value: 'favorite', selected: mode === 'favorite' }, 'Priorizar'),
-    h('option', { value: 'hidden', selected: mode === 'hidden' }, 'Ocultar')
-  );
-  select.addEventListener('change', () => onChange(select.value));
+function brandInitials(brand) {
+  return String(brand || '').split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase();
+}
 
+function modeButton(brand, mode, value, label, onChange) {
+  return h('button', {
+    class: `brand-mode-btn ${mode === value ? 'is-active' : ''}`,
+    type: 'button',
+    'aria-pressed': mode === value ? 'true' : 'false',
+    onClick: () => onChange(value)
+  }, label);
+}
+
+function brandRow(brand, mode, onChange) {
   const discount = h('input', {
     class: 'brand-discount-input',
     type: 'number',
@@ -39,21 +45,43 @@ function brandChip(brand, mode, onChange) {
   discount.addEventListener('change', save);
   discount.addEventListener('blur', save);
 
-  return h('article', { class: `brand-setting-chip is-${mode}` },
-    h('div', { class: 'brand-setting-head' }, h('strong', {}, brand), select),
+  const clearDiscount = h('button', {
+    class: 'brand-discount-clear',
+    type: 'button',
+    title: `Eliminar descuento de ${brand}`,
+    onClick: () => {
+      discount.value = '';
+      DiscountStore.removeBrand(brand);
+    }
+  }, '×');
+
+  return h('article', { class: `brand-setting-row is-${mode}` },
+    h('div', { class: 'brand-setting-logo' }, brandInitials(brand)),
+    h('div', { class: 'brand-setting-main' },
+      h('div', { class: 'brand-setting-title' },
+        h('strong', {}, brand),
+        mode === 'favorite' ? h('span', { class: 'brand-state-pill favorite' }, 'Priorizada') : null,
+        mode === 'hidden' ? h('span', { class: 'brand-state-pill hidden' }, 'Oculta') : null
+      ),
+      h('div', { class: 'brand-mode-segmented' },
+        modeButton(brand, mode, 'normal', 'Normal', onChange),
+        modeButton(brand, mode, 'favorite', 'Priorizar', onChange),
+        modeButton(brand, mode, 'hidden', 'Ocultar', onChange)
+      )
+    ),
     h('label', { class: 'brand-discount-label' },
-      h('span', {}, 'Descuento marca'),
-      h('span', { class: 'brand-discount-row' }, discount, h('small', {}, 'c/L'))
+      h('span', {}, 'Descuento'),
+      h('span', { class: 'brand-discount-row' }, discount, h('small', {}, 'c/L'), clearDiscount)
     )
   );
 }
 
 function BrandsSettings() {
-  const container = h('div', { class: 'brand-settings-grid' });
+  const container = h('div', { class: 'brand-settings-list' });
   function render() {
     clear(container);
     KNOWN_BRANDS.forEach((brand) => {
-      container.append(brandChip(brand, SettingsStore.brandMode(brand), (mode) => {
+      container.append(brandRow(brand, SettingsStore.brandMode(brand), (mode) => {
         SettingsStore.setBrandMode(brand, mode);
         render();
       }));
