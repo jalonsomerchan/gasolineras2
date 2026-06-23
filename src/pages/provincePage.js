@@ -36,7 +36,7 @@ export function ProvincePage(params) {
 
   function municipalityCard(item) {
     const fuel = FuelStore.current();
-    return h('a', { class: 'soft-card', href: `#/municipio/${routePart(item.provincia)}/${routePart(item.municipio)}` },
+    return h('a', { class: 'soft-card municipality-card', href: `#/municipio/${routePart(item.provincia)}/${routePart(item.municipio)}` },
       h('strong', {}, item.municipio),
       h('p', { class: 'station-meta' }, `${integer(item.total_gasolineras)} gasolineras · media ${price(item[fuel.priceField])}`)
     );
@@ -66,20 +66,23 @@ export function ProvincePage(params) {
         limit: 30,
         ariaLabel: `Histórico de precios en ${provincia}`
       }),
-      h('section', { class: 'grid-two section' },
-        h('div', { class: 'stack' },
-          h('div', { class: 'section-head' },
-            h('div', {}, h('h2', { class: 'section-title' }, 'Municipios'), h('p', { class: 'section-subtitle' }, 'Entra en un municipio para ver sus gasolineras.'))
-          ),
-          h('div', { class: 'station-list' }, municipalities.map(municipalityCard))
+      h('section', { class: 'section' },
+        h('div', { class: 'section-head' },
+          h('div', {}, h('h2', { class: 'section-title' }, 'Mapa'), h('p', { class: 'section-subtitle' }, 'Gasolineras con precio actual.'))
         ),
-        h('aside', { class: 'stack' },
-          MapView(mapStations, { small: false }),
-          h('div', { class: 'card card-pad' },
-            h('h2', { class: 'section-title' }, 'Más baratas'),
-            StationList(ranking, { emptyMessage: 'No hay ranking disponible.' })
-          )
-        )
+        MapView(mapStations, { small: false })
+      ),
+      h('section', { class: 'glass-section stations-panel' },
+        h('div', { class: 'section-head' },
+          h('div', {}, h('h2', { class: 'section-title' }, 'Más baratas'), h('p', { class: 'section-subtitle' }, 'Ranking provincial.'))
+        ),
+        StationList(ranking, { ranked: true, sortByPrice: true, emptyMessage: 'No hay ranking disponible.' })
+      ),
+      h('section', { class: 'section' },
+        h('div', { class: 'section-head' },
+          h('div', {}, h('h2', { class: 'section-title' }, 'Municipios'), h('p', { class: 'section-subtitle' }, 'Entra en un municipio para ver sus gasolineras.'))
+        ),
+        h('div', { class: 'municipality-grid' }, municipalities.map(municipalityCard))
       )
     );
   }

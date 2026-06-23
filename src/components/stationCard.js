@@ -53,12 +53,14 @@ export function StationCard(station, options = {}, index = 0) {
       )
     ),
     h('div', { class: 'price-box' },
-      favoriteButton,
-      h('a', { class: 'price-link', href: `#/gasolinera/${station.ideess}` },
-        h('div', { class: 'price-value' }, price(currentPrice)),
-        h('div', { class: 'price-label' }, fuel.shortLabel),
-        delta ? h('div', { class: `price-delta ${delta.className}` }, delta.label) : null
-      )
+      h('div', { class: 'price-line' },
+        h('a', { class: 'price-link', href: `#/gasolinera/${station.ideess}` },
+          h('div', { class: 'price-value' }, price(currentPrice)),
+          h('div', { class: 'price-label' }, fuel.shortLabel)
+        ),
+        favoriteButton
+      ),
+      delta ? h('div', { class: `price-delta ${delta.className}` }, delta.label) : null
     )
   );
 }

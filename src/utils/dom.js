@@ -31,8 +31,12 @@ export function clear(node) {
   return node;
 }
 
+export function Spinner(label = 'Cargando') {
+  return h('span', { class: 'spinner', 'aria-hidden': 'true' }, h('span', { class: 'spinner-dot' }));
+}
+
 export function loading(message = 'Cargando...') {
-  return h('div', { class: 'loading', role: 'status' }, message);
+  return h('div', { class: 'loading', role: 'status', 'aria-live': 'polite' }, Spinner(), h('span', {}, message));
 }
 
 export function errorBox(message) {

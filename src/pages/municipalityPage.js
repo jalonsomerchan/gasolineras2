@@ -24,7 +24,7 @@ export function MunicipalityPage(params) {
       const fuel = FuelStore.current();
       const [stats, stationsResult, ranking, mapStations, trend] = await Promise.all([
         Api.stats({ provincia, municipio }),
-        Api.stations({ provincia, municipio, combustible: fuel.id, order: 'precio_asc', limit: 80 }),
+        Api.stations({ provincia, municipio, combustible: fuel.id, order: 'precio_asc', limit: 120 }),
         Api.ranking({ provincia, municipio, combustible: fuel.id, order: 'baratas', limit: 10 }),
         Api.map({ provincia, municipio, limit: 300 }),
         Api.trend({ provincia, municipio, periodo: 'dia', fecha_desde: dateNDaysAgo(30) }).catch(() => ({ data: [] }))
@@ -37,6 +37,7 @@ export function MunicipalityPage(params) {
 
   function render(stats, stations, ranking, mapStations, trendRows = []) {
     const fuel = FuelStore.current();
+    const sortedStations = [...stations];
     clear(container).append(
       Breadcrumbs([
         { label: provincia, href: `#/provincia/${routePart(provincia)}` },
@@ -62,20 +63,23 @@ export function MunicipalityPage(params) {
         limit: 30,
         ariaLabel: `Histórico de precios en ${municipio}`
       }),
-      h('section', { class: 'grid-two section' },
-        h('div', { class: 'stack' },
-          h('div', { class: 'section-head' },
-            h('div', {}, h('h2', { class: 'section-title' }, 'Listado de gasolineras'), h('p', { class: 'section-subtitle' }, 'Ordenadas por precio ascendente.'))
-          ),
-          StationList(stations)
+      h('section', { class: 'section' },
+        h('div', { class: 'section-head' },
+          h('div', {}, h('h2', { class: 'section-title' }, 'Mapa'), h('p', { class: 'section-subtitle' }, 'Precios actuales sobre el mapa.'))
         ),
-        h('aside', { class: 'stack' },
-          MapView(mapStations, { small: false }),
-          h('div', { class: 'card card-pad' },
-            h('h2', { class: 'section-title' }, 'Top precios'),
-            StationList(ranking.slice(0, 5), { emptyMessage: 'No hay ranking disponible.' })
-          )
-        )
+        MapView(mapStations, { small: false })
+      ),
+      h('section', { class: 'glass-section stations-panel' },
+        h('div', { class: 'section-head' },
+          h('div', {}, h('h2', { class: 'section-title' }, 'Listado de gasolineras'), h('p', { class: 'section-subtitle' }, 'Ordenadas por precio ascendente.'))
+        ),
+        StationList(sortedStations, { ranked: true, sortByPrice: true })
+      ),
+      h('section', { class: 'glass-section stations-panel' },
+        h('div', { class: 'section-head' },
+          h('div', {}, h('h2', { class: 'section-title' }, 'Top precios'), h('p', { class: 'section-subtitle' }, 'Las mejores opciones del municipio.'))
+        ),
+        StationList(ranking.slice(0, 5), { ranked: true, sortByPrice: true, emptyMessage: 'No hay ranking disponible.' })
       )
     );
   }

@@ -1,5 +1,5 @@
 import { Api } from '../services/api.js';
-import { h, clear } from '../utils/dom.js';
+import { h, clear, loading } from '../utils/dom.js';
 import { routePart } from '../utils/format.js';
 
 function suggestionHref(item) {
@@ -22,7 +22,7 @@ export function SearchBox() {
   const input = h('input', {
     class: 'search-input',
     type: 'search',
-    placeholder: 'Buscar gasolinera o zona',
+    placeholder: 'Buscar',
     autocomplete: 'off',
     'aria-label': 'Buscar gasolineras, municipios o provincias'
   });
@@ -39,12 +39,12 @@ export function SearchBox() {
       return;
     }
     results.hidden = false;
-    results.append(h('div', { class: 'loading' }, 'Buscando...'));
+    results.append(loading('Buscando...'));
     try {
       suggestions = await Api.autocomplete(q, 'all', 8);
       clear(results);
       if (!suggestions.length) {
-        results.append(h('div', { class: 'empty' }, 'Sin resultados'));
+        results.append(h('div', { class: 'empty compact-empty' }, 'Sin resultados'));
         return;
       }
       suggestions.forEach((item) => {
@@ -75,7 +75,7 @@ export function SearchBox() {
       if (!suggestions.length) await loadSuggestions();
       if (suggestions[0]) location.hash = suggestionHref(suggestions[0]);
     }
-  }, input, h('button', { class: 'btn', type: 'submit', 'aria-label': 'Buscar' }, 'Buscar'));
+  }, input, h('button', { class: 'btn search-submit', type: 'submit', 'aria-label': 'Buscar' }, '→'));
 
   return h('div', { class: 'search-wrap' }, form, results);
 }

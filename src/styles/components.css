@@ -1413,3 +1413,190 @@ button.filter-chip { cursor: pointer; }
   .price-box { min-width: 100px; }
 }
 .status-strip { display: none !important; }
+
+/* v10: unified lists, breathing room, spinners and map controls */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .65rem;
+  min-height: 58px;
+  border-style: solid;
+}
+.spinner {
+  width: 20px;
+  height: 20px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 2px solid color-mix(in srgb, var(--brand) 24%, transparent);
+  border-top-color: var(--brand-dark);
+  animation: gasolina-spin .78s linear infinite;
+}
+.spinner-dot { display: none; }
+@keyframes gasolina-spin { to { transform: rotate(360deg); } }
+
+.dashboard.home-radar { gap: 1rem; }
+.glass-section,
+.stations-panel,
+.favorites-panel {
+  padding: 1rem 1.1rem .55rem;
+  border-radius: 22px;
+}
+.radar-card,
+.chart-card,
+.card-pad { padding: 1.05rem 1.1rem; }
+.search-panel.is-small { margin-block: .35rem; }
+.filters-row { gap: .75rem; margin-block: .2rem; }
+.section { gap: 1rem; margin-top: .6rem; }
+.stack { gap: 1rem; }
+
+.station-list { display: grid; gap: 0; }
+.station-card,
+.favorites-panel .station-card,
+.stations-panel .station-card {
+  grid-template-columns: 32px 48px minmax(0, 1fr) minmax(156px, auto);
+  gap: .82rem;
+  min-height: 84px;
+  padding: .82rem 0;
+  align-items: center;
+}
+.station-card:not(:last-child) { border-bottom: 1px solid var(--border); }
+.station-main { min-width: 0; }
+.station-title,
+.station-title a {
+  font-size: .96rem;
+  line-height: 1.16;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.station-meta {
+  font-size: .82rem;
+  line-height: 1.32;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.station-actions { margin-top: .32rem; gap: .38rem; }
+.rank { width: 30px; height: 30px; font-size: .82rem; }
+.station-logo { width: 48px; height: 48px; border-radius: 15px; font-size: .78rem; }
+.price-box {
+  min-width: 156px;
+  justify-items: end;
+  align-items: center;
+  gap: .24rem;
+}
+.price-line {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: .48rem;
+  min-width: 100%;
+}
+.price-link {
+  min-width: 0;
+  text-align: right;
+}
+.price-value { font-size: 1.18rem; line-height: 1; }
+.price-label { margin-top: .15rem; }
+.price-delta {
+  max-width: 156px;
+  white-space: normal;
+  text-align: right;
+  line-height: 1.18;
+  font-size: .72rem;
+}
+.favorite-btn {
+  flex: 0 0 auto;
+  order: 0;
+  width: 28px;
+  height: 28px;
+}
+
+.map-card { position: relative; overflow: hidden; }
+.map-view { height: 390px; min-height: 390px; }
+.map-view.small { height: 168px; min-height: 168px; }
+.map-actions {
+  position: absolute;
+  z-index: 402;
+  top: .75rem;
+  left: .75rem;
+  display: inline-flex;
+  gap: .38rem;
+  padding: .32rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 15px;
+  background: color-mix(in srgb, var(--surface-strong) 86%, transparent);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 12px 28px rgba(0,0,0,.12);
+}
+.map-action {
+  width: 34px;
+  height: 34px;
+  display: inline-grid;
+  place-items: center;
+  border: 0;
+  border-radius: 11px;
+  background: transparent;
+  color: var(--text);
+  font-size: .82rem;
+  font-weight: 950;
+}
+.map-action:hover,
+.map-action:focus-visible {
+  background: var(--brand-soft);
+  color: var(--brand-dark);
+}
+.map-action.is-loading { color: var(--brand-dark); }
+.map-open-button { right: .82rem; }
+
+.municipality-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: .75rem;
+}
+.municipality-card { display: grid; gap: .25rem; }
+
+@media (min-width: 860px) {
+  .station-card,
+  .favorites-panel .station-card,
+  .stations-panel .station-card {
+    grid-template-columns: 34px 50px minmax(0, 1fr) minmax(168px, auto);
+    min-height: 88px;
+    padding: .9rem 0;
+  }
+  .price-box { min-width: 168px; }
+  .price-delta { max-width: 168px; }
+}
+@media (max-width: 700px) {
+  .glass-section,
+  .stations-panel,
+  .favorites-panel { padding: .9rem .9rem .35rem; }
+  .station-card,
+  .favorites-panel .station-card,
+  .stations-panel .station-card {
+    grid-template-columns: 28px minmax(0, 1fr) minmax(124px, auto);
+    gap: .65rem;
+    min-height: 78px;
+    padding: .78rem 0;
+  }
+  .station-logo { display: none; }
+  .price-box { min-width: 124px; }
+  .price-line { gap: .34rem; }
+  .price-value { font-size: 1.04rem; }
+  .price-delta { max-width: 124px; font-size: .64rem; }
+  .map-actions { top: .55rem; left: .55rem; gap: .24rem; }
+  .map-action { width: 30px; height: 30px; border-radius: 10px; }
+}
+@media (max-width: 470px) {
+  .station-card,
+  .favorites-panel .station-card,
+  .stations-panel .station-card {
+    grid-template-columns: minmax(0, 1fr) minmax(112px, auto);
+  }
+  .station-card .rank { display: none; }
+  .price-box { min-width: 112px; }
+  .price-delta { max-width: 112px; }
+  .favorite-btn { width: 26px; height: 26px; }
+}

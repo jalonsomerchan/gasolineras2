@@ -335,3 +335,29 @@
 @media (max-width: 540px) {
   .dashboard.home-radar { gap: .72rem; }
 }
+
+/* v10 breathing room */
+.main {
+  padding-top: .42rem;
+}
+.dashboard.home-radar {
+  gap: 1rem;
+}
+.section-head {
+  margin-bottom: .15rem;
+}
+.hero {
+  display: grid;
+  gap: .5rem;
+  margin: .8rem 0 1rem;
+}
+.hero h1 {
+  margin: 0;
+  font-size: clamp(1.9rem, 7vw, 3rem);
+  line-height: 1;
+  letter-spacing: -.075em;
+}
+.hero p { margin: 0; color: var(--muted); }
+@media (min-width: 860px) {
+  .main, .fuel-row, .header-inner { width: min(100% - 2.2rem, var(--max-width)); }
+}
