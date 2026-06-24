@@ -3,5 +3,6 @@
     "seo:pages": "node scripts/generate-seo-pages.js"
   },
   "type": "module",
-  "private": true
+  "private": true,
+  "devDependencies": {}
 }
