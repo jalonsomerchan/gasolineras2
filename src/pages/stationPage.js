@@ -5,7 +5,7 @@ import { FavoritesStore } from '../state/favoritesStore.js';
 import { FuelStore } from '../state/fuelStore.js';
 import { h, loading, errorBox, clear } from '../utils/dom.js';
 import { dateText, numberValue, price, routePart, stationName } from '../utils/format.js';
-import { displayDelta, displayFuelPrice, stationBrand } from '../utils/stationSettings.js';
+import { displayDelta, displayFuelPrice, stationBrand, stationBrandLogo } from '../utils/stationSettings.js';
 import { Breadcrumbs } from '../components/breadcrumbs.js';
 import { MapView } from '../components/mapView.js';
 import { StationList } from '../components/stationList.js';
@@ -204,6 +204,7 @@ export function StationPage(params) {
     const currentInfo = DiscountStore.priceInfo(station, station[fuel.priceField]);
     const currentDisplay = displayFuelPrice(currentInfo.effective);
     const originalDisplay = currentInfo.hasDiscount ? displayFuelPrice(currentInfo.original) : null;
+    const brandLogo = stationBrandLogo(station);
 
     clear(container).append(
       Breadcrumbs([
@@ -217,6 +218,9 @@ export function StationPage(params) {
           station.fecha ? h('span', { class: 'pill' }, `Actualizado ${dateText(station.fecha)}`) : null
         ),
         h('div', { class: 'station-hero-content' },
+          h('div', { class: `station-hero-logo ${brandLogo ? 'has-brand-logo' : ''}` },
+            brandLogo ? h('img', { src: brandLogo, alt: '' }) : stationBrand(station).slice(0, 2).toUpperCase()
+          ),
           h('div', {},
             h('h1', {}, stationName(station)),
             h('p', {}, [station.direccion, station.municipio, station.provincia].filter(Boolean).join(' · '))

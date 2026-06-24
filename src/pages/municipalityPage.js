@@ -76,13 +76,13 @@ export function MunicipalityPage(params) {
         h('div', { class: 'section-head' },
           h('div', {}, h('h2', { class: 'section-title' }, 'Listado de gasolineras'), h('p', { class: 'section-subtitle' }, 'Ordenadas por precio ascendente.'))
         ),
-        StationList(sortedStations, { ranked: true, sortByPrice: true })
+        StationList(sortedStations, { sortByPrice: true })
       ),
       h('section', { class: 'glass-section stations-panel' },
         h('div', { class: 'section-head' },
           h('div', {}, h('h2', { class: 'section-title' }, 'Top precios'), h('p', { class: 'section-subtitle' }, 'Las mejores opciones del municipio.'))
         ),
-        StationList(ranking.slice(0, 5), { ranked: true, sortByPrice: true, emptyMessage: 'No hay ranking disponible.' })
+        StationList(ranking.slice(0, 5), { sortByPrice: true, emptyMessage: 'No hay ranking disponible.' })
       )
     );
   }

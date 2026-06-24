@@ -51,7 +51,6 @@ export function RadarPage() {
     clear(sortContainer).append(SortToggle(sortBy, (next) => { sortBy = next; render(); }));
     clear(mapContainer).append(MapView(sorted.slice(0, 60), { center: currentLocation, tall: true }));
     clear(listContainer).append(StationList(sorted.slice(0, 12), {
-      ranked: true,
       emptyMessage: 'No se han encontrado gasolineras cercanas.'
     }));
     locationText.textContent = locationLabel(currentLocation);
@@ -124,4 +123,3 @@ export function RadarPage() {
   load(false);
   return page;
 }
-

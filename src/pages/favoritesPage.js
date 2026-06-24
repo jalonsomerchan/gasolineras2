@@ -137,7 +137,6 @@ export function FavoritesPage() {
           h('div', {}, h('h2', { class: 'section-title' }, 'Listado de favoritos'), h('p', { class: 'section-subtitle' }, 'Las mismas tarjetas que en el resto de la app.'))
         ),
         StationList(stations, {
-          ranked: true,
           sortByPrice: true,
           onFavoriteChange: load,
           emptyMessage: 'No tienes favoritos guardados.'

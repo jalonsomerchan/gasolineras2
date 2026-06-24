@@ -9,7 +9,8 @@ const PERIODS = [
   { id: '7', label: '7 días', days: 7, limit: 7 },
   { id: '30', label: '30 días', days: 30, limit: 30 },
   { id: '90', label: '90 días', days: 90, limit: 90 },
-  { id: '365', label: '1 año', days: 365, limit: 365 }
+  { id: '365', label: '1 año', days: 365, limit: 365 },
+  { id: 'all', label: 'Desde siempre', from: '2000-01-01' }
 ];
 
 function dateNDaysAgo(days) {
@@ -83,6 +84,13 @@ export function HistoricalExplorer(options = {}) {
   let currentPeriod = PERIODS.find((item) => item.id === period) || PERIODS[1];
   let rows = options.initialRows || [];
 
+  function subtitleForPeriod() {
+    if (options.subtitle) return options.subtitle;
+    return currentPeriod.id === 'all'
+      ? 'Todo el histórico disponible'
+      : `Últimos ${currentPeriod.label}`;
+  }
+
   const body = h('div', { class: 'historical-explorer-body' });
   const buttons = h('div', { class: 'period-buttons', role: 'tablist', 'aria-label': 'Periodo histórico' });
 
@@ -98,7 +106,7 @@ export function HistoricalExplorer(options = {}) {
     clear(body).append(
       HistoricalChart(rows, {
         title: options.title || `Histórico ${FuelStore.current().label}`,
-        subtitle: options.subtitle || `Últimos ${currentPeriod.label}`,
+        subtitle: subtitleForPeriod(),
         limit: currentPeriod.limit,
         ariaLabel: options.ariaLabel || 'Histórico de precios'
       }),
@@ -114,7 +122,7 @@ export function HistoricalExplorer(options = {}) {
       const result = await Api.trend({
         ...(options.filters || {}),
         periodo: 'dia',
-        fecha_desde: dateNDaysAgo(nextPeriod.days)
+        fecha_desde: nextPeriod.from || (nextPeriod.days ? dateNDaysAgo(nextPeriod.days) : undefined)
       });
       rows = result?.data || [];
       renderBody();

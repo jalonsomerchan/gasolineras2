@@ -18,6 +18,33 @@ export function stationBrand(station) {
   return fallback.charAt(0) + fallback.slice(1).toLowerCase();
 }
 
+const BRAND_LOGOS = [
+  ['REPSOL', './assets/brands/repsol.svg'],
+  ['CAMPSA', './assets/brands/campsa.svg'],
+  ['CEPSA', './assets/brands/cepsa.svg'],
+  ['BALLENOIL', './assets/brands/ballenoil.svg'],
+  ['BP', './assets/brands/bp.svg'],
+  ['GALP', './assets/brands/galp.svg'],
+  ['PLENOIL', './assets/brands/plenoil.svg'],
+  ['PLENERGY', './assets/brands/plenergy.svg'],
+  ['SHELL', './assets/brands/shell.svg'],
+  ['PETRONOR', './assets/brands/petronor.svg'],
+  ['AVIA', './assets/brands/avia.svg'],
+  ['Q8', './assets/brands/q8.svg'],
+  ['EASYGAS', './assets/brands/easygas.svg'],
+  ['CARREFOUR', './assets/brands/carrefour.svg'],
+  ['ALCAMPO', './assets/brands/alcampo.svg'],
+  ['BONAREA', './assets/brands/bonarea.svg'],
+  ['COOP', './assets/brands/coop.svg'],
+  ['TAMOIL', './assets/brands/tamoil.svg']
+];
+
+export function stationBrandLogo(station) {
+  const brand = normalize(stationBrand(station));
+  const match = BRAND_LOGOS.find(([name]) => brand.includes(name) || name.includes(brand));
+  return match?.[1] || null;
+}
+
 export function isStationHidden(station) {
   return SettingsStore.brandMode(stationBrand(station)) === 'hidden';
 }

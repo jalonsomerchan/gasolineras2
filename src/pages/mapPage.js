@@ -26,7 +26,6 @@ export function MapPage() {
       onSearchHere: (center) => loadAt(center)
     }));
     clear(listContainer).append(StationList(stations.slice(0, 15), {
-      ranked: true,
       sortByPrice: true,
       emptyMessage: 'No hay gasolineras en esta zona.'
     }));

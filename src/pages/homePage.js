@@ -8,12 +8,10 @@ import { h, loading, errorBox, clear } from '../utils/dom.js';
 import { numberValue, shortPrice } from '../utils/format.js';
 import { EmptyState } from '../components/emptyState.js';
 import { MapView } from '../components/mapView.js';
-import { PriceRadar } from '../components/priceRadar.js';
 import { SearchBox } from '../components/searchBox.js';
 import { SortToggle } from '../components/sortToggle.js';
 import { StationList } from '../components/stationList.js';
 import { TrendCard } from '../components/trendCard.js';
-import { LocationGate } from '../components/locationGate.js';
 import { InstallPrompt } from '../components/installPrompt.js';
 
 function bestPrice(stations) {
@@ -30,6 +28,26 @@ function dateNDaysAgo(days) {
   const date = new Date();
   date.setDate(date.getDate() - days);
   return date.toISOString().slice(0, 10);
+}
+
+function MapLocationBanner(onSearch) {
+  return h('div', { class: 'home-map-location' },
+    h('div', { class: 'home-map-location-icon', 'aria-hidden': 'true' }, '⌖'),
+    h('div', { class: 'home-map-location-copy' },
+      h('strong', {}, 'Activa tu ubicación'),
+      h('span', {}, 'Para ver el radar de precios cerca de ti.')
+    ),
+    h('button', { class: 'btn primary home-map-location-button', type: 'button', onClick: onSearch }, 'Activar ubicación')
+  );
+}
+
+function HomeMapPreview() {
+  return h('div', { class: 'home-map-preview', role: 'img', 'aria-label': 'Vista previa del mapa de precios' },
+    h('div', { class: 'home-map-preview-copy' },
+      h('strong', {}, 'Mapa de precios'),
+      h('span', {}, 'Activa la ubicación para ver pines cercanos.')
+    )
+  );
 }
 
 export function HomePage() {
@@ -69,11 +87,6 @@ export function HomePage() {
     return `${currentLocation.label || 'Cerca de ti'} · ${suffix}`;
   }
 
-  function renderRadar() {
-    clear(radarContainer);
-    radarContainer.append(PriceRadar(nearbyStations, locationLabel()));
-  }
-
   function renderStatus() {
     const fuel = FuelStore.current();
     bestPriceValue.textContent = `${shortPrice(bestPrice(nearbyStations))} €/L`;
@@ -85,7 +98,7 @@ export function HomePage() {
     clear(nearbyContainer);
     clear(mapContainer);
     clear(sortContainer);
-    renderRadar();
+    clear(radarContainer);
     renderStatus();
     if (!nearbyStations.length) {
       nearbyContainer.append(EmptyState('No se han encontrado gasolineras cercanas.'));
@@ -96,8 +109,10 @@ export function HomePage() {
       renderNearby();
     }));
     const sorted = sortedStations();
-    nearbyContainer.append(StationList(sorted.slice(0, 8), { emptyMessage: 'No hay gasolineras cercanas.', ranked: true }));
-    mapContainer.append(MapView(sorted.slice(0, 30), { center: currentLocation, small: true }));
+    nearbyContainer.append(StationList(sorted.slice(0, 8), { emptyMessage: 'No hay gasolineras cercanas.' }));
+    mapContainer.append(h('section', { class: 'home-map-section' },
+      MapView(sorted.slice(0, 30), { center: currentLocation, small: true })
+    ));
   }
 
   async function loadFavorites() {
@@ -110,7 +125,7 @@ export function HomePage() {
     try {
       const fuel = FuelStore.current();
       const stations = (await Api.stationsDetail(ids)).sort((a, b) => (numberValue(DiscountStore.effectivePrice(a, a[fuel.priceField] ?? a.precio)) ?? 999) - (numberValue(DiscountStore.effectivePrice(b, b[fuel.priceField] ?? b.precio)) ?? 999));
-      favoriteContainer.append(StationList(stations.slice(0, 6), { onFavoriteChange: loadFavorites, ranked: true, sortByPrice: true, emptyMessage: 'No tienes favoritos guardados.' }));
+      favoriteContainer.append(StationList(stations.slice(0, 6), { onFavoriteChange: loadFavorites, sortByPrice: true, emptyMessage: 'No tienes favoritos guardados.' }));
     } catch (error) {
       favoriteContainer.append(errorBox(error.message));
     }
@@ -132,10 +147,11 @@ export function HomePage() {
     clear(mapContainer);
     clear(sortContainer);
     locationText.textContent = 'Permiso de ubicación pendiente';
-    radarContainer.append(LocationGate({
-      onSearch: () => loadNearby(true),
-      text: 'Pulsa el botón para permitir la ubicación y ver el radar de precios cerca de ti.'
-    }));
+    mapContainer.append(h('section', { class: 'home-map-section is-pending-location' },
+      HomeMapPreview(),
+      MapLocationBanner(() => loadNearby(true))
+    ));
+    nearbyContainer.append(EmptyState('Activa tu ubicación para ver las gasolineras cercanas ordenadas por precio.'));
   }
 
   async function loadNearby(forceFresh = false) {
@@ -146,7 +162,6 @@ export function HomePage() {
       renderLocationGate();
       return;
     }
-    radarContainer.append(loading('Obteniendo precios cercanos...'));
     nearbyContainer.append(loading('Obteniendo ubicación...'));
     try {
       currentLocation = await deviceOrBestLocation();
@@ -181,14 +196,9 @@ export function HomePage() {
       ),
       favoriteContainer
     ),
-    h('section', { class: 'search-panel is-small' }, SearchBox(), h('button', { class: 'filter-button', type: 'button', title: 'Filtros' }, '☷')),
+    h('section', { class: 'search-panel is-small is-single' }, SearchBox()),
+    mapContainer,
     radarContainer,
-    h('section', { class: 'filters-row', 'aria-label': 'Filtros rápidos' },
-      h('button', { class: 'filter-chip is-active', type: 'button', onClick: () => loadNearby(true), title: 'Usar mi ubicación actual' }, `⌖ ${NEARBY_RADIUS_KM} km`),
-      h('span', { class: 'filter-chip' }, 'Provincia⌄'),
-      h('span', { class: 'filter-chip' }, 'Municipio⌄'),
-      h('span', { class: 'filter-chip' }, 'Más filtros ☷')
-    ),
     h('section', { class: 'glass-section stations-panel' },
       h('div', { class: 'section-head' },
         h('div', {}, h('h2', { class: 'section-title' }, 'Estaciones cercanas'), h('p', { class: 'section-subtitle location-inline' }, locationText, retryLocationButton)),
@@ -196,7 +206,6 @@ export function HomePage() {
       ),
       nearbyContainer
     ),
-    mapContainer,
     trendContainer,
     InstallPrompt()
   );

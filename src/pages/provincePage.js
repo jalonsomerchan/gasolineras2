@@ -79,7 +79,7 @@ export function ProvincePage(params) {
         h('div', { class: 'section-head' },
           h('div', {}, h('h2', { class: 'section-title' }, 'Más baratas'), h('p', { class: 'section-subtitle' }, 'Ranking provincial.'))
         ),
-        StationList(ranking, { ranked: true, sortByPrice: true, emptyMessage: 'No hay ranking disponible.' })
+        StationList(ranking, { sortByPrice: true, emptyMessage: 'No hay ranking disponible.' })
       ),
       h('section', { class: 'section' },
         h('div', { class: 'section-head' },

@@ -39,7 +39,7 @@ export function HistoricalChart(rows = [], options = {}) {
   const latest = data.at(-1)?.value ?? null;
   const media = average(data);
   const canvas = h('canvas', { id, role: 'img', 'aria-label': options.ariaLabel || `Histórico de ${fuel.label}` });
-  const status = h('span', { class: 'chart-status' }, data.length ? `${data.length} días` : 'Sin datos');
+  const status = h('span', { class: 'chart-status' }, data.length ? `${data.length} registros` : 'Sin datos');
 
   window.requestAnimationFrame(() => renderChart(id, data, options));
 

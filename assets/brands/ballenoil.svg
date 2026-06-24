@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="Ballenoil">
+  <rect width="96" height="96" rx="24" fill="#ffffff"/>
+  <circle cx="48" cy="48" r="34" fill="#e9fbfb"/>
+  <circle cx="48" cy="25" r="8" fill="#25c7cf"/>
+  <circle cx="64" cy="32" r="8" fill="#25c7cf"/>
+  <circle cx="71" cy="48" r="8" fill="#25c7cf"/>
+  <circle cx="64" cy="64" r="8" fill="#25c7cf"/>
+  <circle cx="48" cy="71" r="8" fill="#25c7cf"/>
+  <circle cx="32" cy="64" r="8" fill="#25c7cf"/>
+  <circle cx="25" cy="48" r="8" fill="#25c7cf"/>
+  <circle cx="32" cy="32" r="8" fill="#25c7cf"/>
+</svg>

@@ -3,7 +3,7 @@ import { FavoritesStore } from '../state/favoritesStore.js';
 import { FuelStore } from '../state/fuelStore.js';
 import { h } from '../utils/dom.js';
 import { dateText, distance, numberValue, price, routePart, stationName } from '../utils/format.js';
-import { displayDelta, displayFuelPrice, stationBrand } from '../utils/stationSettings.js';
+import { displayDelta, displayFuelPrice, stationBrand, stationBrandLogo } from '../utils/stationSettings.js';
 
 function initials(name) {
   return String(name || 'G').trim().slice(0, 2).toUpperCase();
@@ -15,9 +15,9 @@ function priceDelta(currentPrice, cheapestPrice) {
   if (current === null || cheapest === null || current <= 0 || cheapest <= 0) return null;
   const delta = current - cheapest;
   if (Math.abs(delta) < 0.0005) {
-    return { label: 'Opción más barata', className: 'is-cheapest' };
+    return { label: 'Más barata', className: 'is-cheapest' };
   }
-  return { label: `+${displayDelta(delta)} más cara`, className: 'is-more-expensive' };
+  return { label: `${displayDelta(delta)} más cara`, className: 'is-more-expensive' };
 }
 
 export function StationCard(station, options = {}, index = 0) {
@@ -31,6 +31,7 @@ export function StationCard(station, options = {}, index = 0) {
   const title = stationName(station);
   const subtitle = [station.direccion, station.municipio].filter(Boolean).join(' · ');
   const delta = priceDelta(currentPrice, options.cheapestPrice);
+  const logo = stationBrandLogo(station);
 
   const favoriteButton = h('button', {
     class: `favorite-btn ${isFavorite ? 'is-active' : ''}`,
@@ -55,8 +56,9 @@ export function StationCard(station, options = {}, index = 0) {
   }, isFavorite ? '★' : '☆');
 
   return h('article', { class: `station-card ${options.compact ? 'is-compact' : ''} ${priceInfo.hasDiscount ? 'has-discount' : ''}` },
-    options.ranked ? h('div', { class: `rank ${index < 3 ? 'is-top' : ''}` }, String(index + 1)) : null,
-    h('a', { class: 'station-logo', href: `#/gasolinera/${station.ideess}`, 'aria-hidden': 'true' }, initials(title)),
+    h('a', { class: `station-logo ${logo ? 'has-brand-logo' : ''}`, href: `#/gasolinera/${station.ideess}`, 'aria-hidden': 'true' },
+      logo ? h('img', { src: logo, alt: '' }) : initials(title)
+    ),
     h('div', { class: 'station-main' },
       h('h3', { class: 'station-title' }, h('a', { href: `#/gasolinera/${station.ideess}` }, title)),
       h('p', { class: 'station-meta' }, subtitle || 'Sin dirección'),
