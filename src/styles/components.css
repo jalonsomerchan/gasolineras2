@@ -909,7 +909,7 @@
 .search-input {
   min-height: 38px;
   padding: 0 .45rem;
-  font-size: .9rem;
+  font-size: 1rem;
 }
 .search-form .btn {
   width: 36px;
@@ -1110,7 +1110,7 @@ button.filter-chip { cursor: pointer; }
 }
 .search-icon { font-size: .82rem; opacity: .75; }
 .search-form input {
-  font-size: .84rem;
+  font-size: 1rem;
   letter-spacing: -.015em;
 }
 .search-form .btn {
@@ -2031,6 +2031,7 @@ button.filter-chip { cursor: pointer; }
   background: var(--surface-soft);
   color: var(--text);
   font: inherit;
+  font-size: 16px;
   font-weight: 900;
   outline: none;
 }
@@ -2176,7 +2177,7 @@ button.filter-chip { cursor: pointer; }
   background: var(--surface);
   color: var(--text);
   font: inherit;
-  font-size: .85rem;
+  font-size: 16px;
   font-weight: 850;
   outline: none;
 }
@@ -2507,6 +2508,7 @@ button.filter-chip { cursor: pointer; }
   border-radius: 12px;
   background: var(--surface-strong);
   color: var(--text);
+  font-size: 16px;
   font-weight: 850;
 }
 .brand-setting-chip { display: grid; gap: .55rem; align-content: start; }
@@ -2965,6 +2967,7 @@ button.filter-chip { cursor: pointer; }
   padding: 14px 16px;
   color: var(--text);
   font: inherit;
+  font-size: 16px;
   font-weight: 800;
 }
 
